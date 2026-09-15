@@ -1,13 +1,12 @@
-These are the plan's open questions, restated as parameters the workflow needs. Each
-must have a committed default, or the workflow will stop and ask.
+These are answers to the plan's open questions.
 
 | Open question | Answer  | Notes
 |---|---|---|
 | Output pattern | bare `%v`, no timestamp | Want to simplify output to ease comparisons. Time context is available elsewhere |
-| Header home | larcorealg/larcorealg/LoggingUtil/Logging.h | Separate type of functionality than in CoreUtils |
-| Hot-path guard style | Context dependendent. Identify cases, ask for input. | There is not a rule to govern all cases, so just ask. Most will be simple. |
-| File destinations from old config | keep as a second sink | Want to replicate possibly useful functionality in old version | 
-| Deprecation window for renamed public init functions | break immediately | Just do it |
+| Header home | larcorealg/larcorealg/LoggingUtil/Logging.h | Separate type of functionality than in CoreUtils, so a new sub-directory |
+| Hot-path guard style | Context dependendent. Preferred default is to leave as is unless expected message output is extremely high (e.g., for raw data loops, decompression loops). In those cases, a function-local one-count guard with summary on exit is acceptable. For all other cases, propose leaving it as is, accumulate occurrences and ask...If expected message frequency is not obvious, Where frequency cannot be easily deduced, then identify cases, ask for input. See decisions below for currently identified cases. | There is not a rule to govern all cases, so just collect them all and ask if the frequency is not obvious. Most will be simple. |
+| File destinations from old config | keep as a second sink | Want to retain possibly useful functionality from the old version | 
+| Deprecation window for renamed public init functions | break immediately | Best to just work through the pain now |
 
 Notes on the hot-path guard style for the current set of files in larcorealg: 
 - lardataobj/lardataobj/RecoBase/Event.cxx :  leave this as is
