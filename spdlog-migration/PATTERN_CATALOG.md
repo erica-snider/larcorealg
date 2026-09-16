@@ -240,7 +240,8 @@ whether it can be reached repeatedly. Two shapes found in practice:
 1. one-shot guard (function-local `static std::once_flag`) — for "this configuration is
    wrong" messages that are equally useful once;
 2. counter guard ("... and N more suppressed") — for data-dependent messages where the
-   *count* is diagnostically meaningful, e.g. corrupt input;
+   *count* is diagnostically meaningful, e.g. corrupt input. Use this for raw data, test,
+   and decompression / compression / parsing loops;
 3. demote to `debug` — smallest change, but hides real data corruption; acceptable only
    when the message is genuinely not actionable.
 
@@ -395,7 +396,6 @@ must have a committed default, or the workflow will stop and ask.
 |---|---|---|
 | Output pattern | timestamped+level, or bare `%v` | bare `%v` makes the before/after output diff far easier; timestamps must otherwise be normalized away |
 | Header home | lowest common dependency (preferred), new dependency, or duplication | §6.2; **blocks the foundation phase** |
-| Hot-path guard style | one-shot / counter / demote | §4.1 gives the preference order; per-site judgement still needed |
 | File destinations from old config | keep as a second sink, or drop | §4.5 |
 | Deprecation window for renamed public init functions | one release with forwarders, or break immediately | affects out-of-package callers |
 
