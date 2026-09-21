@@ -36,6 +36,14 @@ for src in $(ls -1 *.cxx | sort); do
   base="${src%.cxx}"
   [[ -n "$filter" && "$base" != *"$filter"* ]] && continue
 
+  # 12 includes the real installed header and links libspdlog, so it needs the
+  # gcc that spdlog was built with. It has its own driver.
+  if [[ "$base" == 12-* ]]; then
+    echo "  (skipping $base -- run ./verify-installed-header.sh instead)"
+    echo
+    continue
+  fi
+
   echo "=============================================================="
   echo "  $base"
   echo "=============================================================="
