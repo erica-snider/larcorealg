@@ -18,7 +18,7 @@ where "ctest arguments" are passed directly to the `ctest` command line (run int
 `spack mpd test`).
 
 Alternatively, `cmake` and `ctest` commands can be run directly within the
-mpddev/build directory after first setting the spack environment:
+mpddev/build directory after first activating the spack environment:
 ```
 spack env activate <path to local>
 ```
@@ -28,3 +28,7 @@ to the `mpddev/local` directory. So, if in the `build` directory, then:
 spack env activate ../local
 ```
 then `ctest ...`, etc.
+
+The version of gcc currently needed is v12.5.0. If after activating the spack environment, this 
+is not the version you get in response to `gcc --version` , then there is a problem with the
+engironment and you should stop immediately.
