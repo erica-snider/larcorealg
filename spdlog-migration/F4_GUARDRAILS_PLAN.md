@@ -74,6 +74,12 @@ That is a stop-and-report condition, not something to paper over: without a base
 `GATE B` step 1 is unenforceable and the whole "catch silent regressions" argument
 collapses. Surface it rather than substituting a weaker check.
 
+**Solution**. `guardrails/env.sh` has been added. Sourcing this file will set up `spack mpd`
+as needed to build and test the code. `env.sh` is idempotent. 
+`larcorealg/spdlog-migration/BUILDING_WITH_SPACK_MPD.md` explains how to use `spack mpd` 
+to build code and run tests, and explains the connection to `spack`, `spack mpd` 
+and `ctest` commands.
+
 ---
 
 ## G1. Grep gate
