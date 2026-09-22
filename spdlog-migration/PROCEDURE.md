@@ -64,15 +64,32 @@ emits nothing and formats nothing; constructed-but-never-streamed emits nothing;
 
 ## F4. Guard rails installed
 
-Install **before** any bulk editing, not after:
+Install **before** any bulk editing, not after. Implemented per
+`F4_GUARDRAILS_PLAN.md`, checked in under `spdlog-migration/guardrails/`:
 
-1. grep gate — fail if `mf::` / `MF_LOG_` / `messagefacility` reappears;
+1. grep gate — fail if `mf::` / `MF_LOG_` / `messagefacility` reappears.
+   `guardrails/grep-gate.sh [path ...]` (default: the four package trees).
+   A standing, documented allowlist is applied automatically; `--no-allowlist`
+   disables it for auditing the waiver list itself.
 2. format-string lint — fail on an `spdlog::` call whose format argument is not a
    string literal (§1.1; this hazard fails at runtime only, and only for
-   brace-containing messages);
+   brace-containing messages).
+   `guardrails/format-string-lint.sh [path ...]`; `--self-test` runs the
+   required two-sided acceptance (clean against `Logging.cxx`, flags
+   `prototypes/02-runtime-format-string-hazard.cxx`).
 3. output-diff harness, checked in as a script so it can be re-run per file.
+   `guardrails/gen-targets.sh` regenerates the source→test manifest
+   (`guardrails/targets.tsv`) from the live ninja/ctest build graph — this is
+   what makes the harness re-appliable to a new file with no manual mapping.
+   `guardrails/outdiff.sh {baseline|check|levels|report} <test|--all-mf>`
+   captures, normalizes (`guardrails/normalize.sed`), diffs, and reports.
 
-**Check:** all three runnable.
+**Check:** all three runnable —
+`guardrails/grep-gate.sh`,
+`guardrails/format-string-lint.sh --self-test`,
+`guardrails/gen-targets.sh && guardrails/outdiff.sh baseline --all-mf && guardrails/outdiff.sh check --all-mf`.
+All three require `guardrails/env.sh` to be sourced first (see
+`BUILDING_WITH_SPACK_MPD.md`) for anything that runs a test binary.
 
 ## F5. Migration order determined
 
@@ -92,6 +109,14 @@ Verify F0–F5. **Abort** with a specific message if any fails; do not attempt r
 
 Enumerate every mf call site, include, CMake reference, and configuration block in the
 target set. Distinguish live sites from dead includes and commented-out sites (§5.4).
+
+**Before any edit in this target set:** run
+`guardrails/gen-targets.sh && guardrails/outdiff.sh baseline --all-mf` (or
+`baseline <test>` for a narrower target) to capture output baselines for every
+test this set can affect. This is the single most destructible precondition in
+the whole workflow — a baseline cannot be regenerated once its source has been
+migrated (`F4_GUARDRAILS_PLAN.md` finding 6) — so it must happen here, before
+P4, not be treated as implicit.
 
 **Output:** counts by API form; list of files touched; CMake and config references.
 
@@ -172,8 +197,13 @@ compile error nor a test failure. All applicable checks are required:
 1. **Normalized before/after output diff** for the affected tests. Message bodies must
    be identical modulo the added scoped-name prefix. Any other difference is a bug.
    This is the only check that catches a silently vanished level.
+   Command: `guardrails/outdiff.sh check <test>` (or `check --all-mf` for every
+   baselined test in this run). Requires a P1 baseline to already exist.
 2. **Level check** — confirm every trace/debug site still visible under the old
    threshold is still visible (§4.2).
+   Command: `guardrails/outdiff.sh levels <test>`. Note its documented
+   limitation once a test is fully migrated to the bare-`%v` pattern (no level
+   text remains to count) — treat check #1 as authoritative in that case.
 3. **Hot-path check** — confirm each guard from P2 behaves, by exercising the loop or
    comparison path.
 4. **Assertion-reporter check** — if §5.2 applies, deliberately break one assertion and
@@ -183,6 +213,7 @@ compile error nor a test failure. All applicable checks are required:
 6. **Serialization check** — if §7 applies, rebuild dictionaries, confirm class
    versions and checksums unchanged, and read back existing files.
 7. **Grep sweep** — no `mf::`, `MF_LOG_`, or `messagefacility` outside documentation.
+   Command: `guardrails/grep-gate.sh`.
 
 ## P7. Report
 
