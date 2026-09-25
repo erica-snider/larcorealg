@@ -70,6 +70,8 @@ EXCLUDE_FILE_PATTERNS=(
 declare -A ALLOWLIST=(
   ["larcoreobj/larcoreobj/LoggingUtil/Logging.h"]="comment-only references to messagefacility/mf:: as historical/explanatory context in the replacement header's own docs; no live mf call sites"
   ["larcoreobj/larcoreobj/LoggingUtil/Logging.cxx"]="comment-only reference to messagefacility as historical context explaining the second-sink design choice; no live mf call sites"
+  ["/exp/dune/app/users/esnider/code-spack/larsoft3/mpdtest/mpddev/srcs/larcoreobj/larcoreobj/LoggingUtil/Logging.h"]="comment-only references to messagefacility/mf:: as historical/explanatory context in the replacement header's own docs; no live mf call sites"
+  ["/exp/dune/app/users/esnider/code-spack/larsoft3/mpdtest/mpddev/srcs/larcoreobj/larcoreobj/LoggingUtil/Logging.cxx"]="comment-only reference to messagefacility as historical context explaining the second-sink design choice; no live mf call sites"
 )
 
 PATTERN='messagefacility|mf::|MF_LOG_|MF_MessageLogger'
