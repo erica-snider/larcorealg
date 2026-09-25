@@ -152,10 +152,30 @@ shims) come first.
 
 ## GATE A — Smoke test
 
-Before any bulk edit: migrate exactly **one** site exercising the hardest pattern
-present in this set — preferentially an ostream-only ADL type (§3.4) if one is used, or
-the stored-by-value case (§2.5) if present — and compile it in the **real build**, not
-a reduction.
+Before any bulk edit, migrate exactly **one** site exercising the hardest pattern
+present in this set - preferably an ostream-only ADL type (§3.4) if one is used, or the
+stored-by-value case (§2.5) if present. Compile the affected target in the **real
+build**, not a reduced compilation.
+
+Gate A is a coexistence check. If the selected file still contains other
+messagefacility sites, retain both logging includes for this smoke test:
+
+  #include "messagefacility/MessageLogger/MessageLogger.h"
+  #include "larcoreobj/LoggingUtil/Logging.h"
+
+Only the selected site may be converted. Do not remove the messagefacility
+include or dependency during Gate A unless no remaining live messagefacility
+site in the affected target requires it.
+
+A Gate A failure caused by removing an include or dependency while other
+messagefacility sites remain is a workflow error. Restore coexistence and retry
+Gate A. A failure after coexistence has been preserved is a genuine Gate A
+failure and stops the run.
+
+The selected site must compile through the real target and its actual template,
+ADL, and stream-helper paths. A newly written standalone reduction may be used
+only as supplementary evidence; it cannot replace the real-target Gate A
+compilation.
 
 **Stop the entire run if this fails.** Everything downstream depends on the sink
 handling this set's type system, and a failure here means the foundation needs work, not
