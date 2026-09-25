@@ -70,9 +70,7 @@ EXCLUDE_FILE_PATTERNS=(
 declare -A ALLOWLIST=(
   ["larcoreobj/larcoreobj/LoggingUtil/Logging.h"]="comment-only references to messagefacility/mf:: as historical/explanatory context in the replacement header's own docs; no live mf call sites"
   ["larcoreobj/larcoreobj/LoggingUtil/Logging.cxx"]="comment-only reference to messagefacility as historical context explaining the second-sink design choice; no live mf call sites"
-  ["/exp/dune/app/users/esnider/code-spack/larsoft3/mpdtest/mpddev/srcs/larcoreobj/larcoreobj/LoggingUtil/Logging.h"]="comment-only references to messagefacility/mf:: as historical/explanatory context in the replacement header's own docs; no live mf call sites"
-  ["/exp/dune/app/users/esnider/code-spack/larsoft3/mpdtest/mpddev/srcs/larcoreobj/larcoreobj/LoggingUtil/Logging.cxx"]="comment-only reference to messagefacility as historical context explaining the second-sink design choice; no live mf call sites"
-)
+ )
 
 PATTERN='messagefacility|mf::|MF_LOG_|MF_MessageLogger'
 
@@ -181,8 +179,17 @@ if [[ ${#allow_files[@]} -gt 0 ]]; then
   FILTERED="$(mktemp)"
   cp "$RESULTS" "$FILTERED"
   for f in "${allow_files[@]}"; do
-    grep -v -E "(^|/)$(printf '%s' "$f" | sed 's/[.[\*^$()+?{|]/\\&/g'):[0-9]+:" "$FILTERED" > "${FILTERED}.tmp" \
-      && mv "${FILTERED}.tmp" "$FILTERED"
+    # Add handling for absolute and relative allowlist entries, which require
+    # separate matching logic. 
+    escaped="$(printf '%s' "$f" | sed 's/[.[\*^$()+?{|]/\\&/g')"  
+    if [[ "$f" == /* ]]; then
+      pattern="^${escaped}:[0-9]+:"
+    else
+      pattern="(^|/)${escaped}:[0-9]+:"
+    fi
+   
+    grep -v -E "$pattern" "$FILTERED" > "${FILTERED}.tmp"  
+    mv "${FILTERED}.tmp" "$FILTERED"
   done
   mv "$FILTERED" "$RESULTS"
 fi
