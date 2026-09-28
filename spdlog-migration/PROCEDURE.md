@@ -183,18 +183,54 @@ the call sites.
 
 ## P4. Edit
 
+A file is migrated **all at once or not at all.** Between the first edit and the last,
+the file does not compile: the old include has to go and the new one has to arrive, and
+any call site left behind references a name that no longer resolves. There is no safe
+stopping point inside a file, so do not treat the site list as a queue that can be
+paused, and do not interleave a build, a commit, or a report into the middle of one.
+
+**Add the new include first; remove the old include last.** In between, both are
+present and the file still compiles at every intermediate step, which makes a partial
+edit recoverable instead of fatal.
+
 Per file, in the P3 order:
 
-1. swap the include;
-2. apply the level mapping (§2.1);
-3. drop category arguments and manual class/method prefixes already in the text (§2.2);
-4. apply the form-specific transformation from §2 — preserving load-bearing braces
-   (§2.3), not restructuring control flow, not narrowing generic helpers (§2.6);
-5. add hot-path guards per the P2 report (§4.1);
-6. delete stale logger comments (§5.3) and dead includes (§5.4);
-7. delete context-singlet/iteration calls (§2.8).
+1. **Enumerate every live site in this file, and write the list down** — count and line
+   numbers — before changing anything. This list is the definition of done for the file.
+   Use the P2 classification for the file; if it disagrees with what is in the file now,
+   stop and reconcile rather than trusting either.
+2. add the new logging include alongside the existing messagefacility include;
+3. convert **every** site on the list from step 1: apply the level mapping (§2.1); drop
+   category arguments and manual class/method prefixes already in the text (§2.2); apply
+   the form-specific transformation from §2 — preserving load-bearing braces (§2.3), not
+   restructuring control flow, not narrowing generic helpers (§2.6);
+4. add hot-path guards per the P2 report (§4.1);
+5. delete stale logger comments (§5.3) and context-singlet/iteration calls (§2.8);
+6. **verify zero live sites remain, mechanically** (see below). Only then remove the
+   messagefacility include — and only then, for a file that had a dead include and no
+   live sites (§5.4), remove that include;
+7. build the file's target. A file is not done until it compiles.
 
-**No regex or `sed` bulk rewrite** (§5.1). One file per commit.
+### The mechanical check that closes the file
+
+Judgement is what fails here: an agent that believes it has finished will not re-read
+the file to find out that it has not. So do not rely on believing. Run the grep gate on
+the single file and require exit 0:
+
+```
+spdlog-migration/guardrails/grep-gate.sh <path/to/file>     # exit 0 = no live sites
+```
+
+Exit 1 with a non-empty list means the file is **still mid-edit**, regardless of how
+complete it feels. Go back to step 3 and convert what it names. Running this before
+removing the old include is what prevents the build break; running it after is only a
+postmortem.
+
+If the file is genuinely finished, the gate is silent and the target builds. Those two
+facts together — not the agent's sense of completion — are what closes the file.
+
+**No regex or `sed` bulk rewrite** (§5.1). One file per commit, committed only after
+step 7 passes.
 
 ## P5. Build system
 
