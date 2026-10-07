@@ -4,4 +4,5 @@ current_dir=$(pwd)
 cd /exp/dune/app/users/esnider/code-spack/larsoft3/mpdtest
 source spack/setup-env.sh
 spack mpd select mpddev
+spack env activate local
 cd ${current_dir}
