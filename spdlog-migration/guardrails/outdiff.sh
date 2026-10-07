@@ -45,20 +45,34 @@
 # in this top-level process, BEFORE any parallel fan-out -- see
 # activate_env()'s comment for why concurrent activation is avoided.
 #
-# LIMITATION (documented, not silently papered over): the resolved output
-# pattern (OPEN_QUESTION_ANSWERS.md §1: bare `%v`, chosen specifically to ease
-# before/after body comparison) means POST-migration spdlog output carries NO
-# level indicator in the text at all -- unlike messagefacility's `%MSG-e/-w/-i`
-# banners, which `levels` parses for the PRE-migration side. Once a test's
-# code is fully migrated to LAR_LOG_*, `levels` cannot recover a per-level
-# count from that test's own captured text, and says so explicitly rather
-# than fabricating a number. In that situation the authoritative vanished-
-# message detector is `check` (the full normalized body diff): a message that
-# silently stopped being emitted shows up there as a missing line regardless
-# of which level produced it. Run `check` first; treat `levels` as
-# additional confirmation while a test is still on the messagefacility side
-# of a partial migration, or as a way to see the pre-migration level
-# breakdown baked into a stored baseline at any time.
+# OUTPUT FORMAT (current, and what these scripts are calibrated against):
+#   Logging.cxx sets pattern  "[LOG-%l] %v"
+#   Logging.h   emits         "[in <scope>]: <body>"  (or "[in ?]: " with no scope)
+#   => a migrated record's first line reads:
+#        [LOG-info] [in geo::WireReadoutGeom::ChannelsIntersect]: channel 7 ...
+#      and continuation lines of a multi-line body are emitted BARE.
+# normalize.sed rule (1c) strips that decoration; if the format in
+# Logging.h/Logging.cxx changes again, rule (1c), extract_prefix_sidecar()
+# and do_levels_one()'s [LOG-...] parser must be updated together.
+#
+# NOTE: the stored baselines predate this format (they are messagefacility
+# captures and contain no "[LOG-" lines at all). They remain VALID as the
+# "before" side and must NOT be recaptured -- a pre-migration baseline is
+# unrecoverable once the source is migrated (F4_GUARDRAILS_PLAN.md finding 6).
+# Only the "after" side needed to learn the new format.
+#
+# `levels` is a REAL comparison in both directions. The earlier bare-`%v`
+# pattern carried no level indicator, so a per-level count could not be
+# recovered from migrated output; the current "[LOG-%l]" pattern restores it.
+# `levels` therefore now reads the level from EITHER messagefacility's
+# `%MSG-<x>` banners (pre-migration side) or the `[LOG-<level>]` prefix
+# (migrated side), maps them onto a common label, and fails when a level that
+# had records in the baseline has none now -- i.e. it directly catches the
+# silently-vanished trace/debug regression that PATTERN_CATALOG.md §4.2 calls
+# the most likely invisible failure of this migration.
+# `check` (the full normalized body diff) remains the authoritative
+# per-message detector; `levels` is the cheap, specific check for a whole
+# level disappearing. Run both.
 
 set -u
 
@@ -150,9 +164,23 @@ extract_prefix_sidecar() {
   # defect worth seeing." Uses the SAME exclusion list as normalize.sed rule 2
   # so it stays in lockstep with what that rule actually strips.
   local raw_file="$1"
-  grep -oE '^[A-Za-z_][A-Za-z0-9_:<>~,() ]*: ' "$raw_file" 2>/dev/null \
-    | grep -vE '^(Info in <|Environment variable|Working Directory:|Test timeout computed to be:|Test selection:|Geometry file:|Running on detector:|Comparing two wires|Returned wire would be:)' \
-    | sort | uniq -c | sort -rn
+  {
+    # (a) DECORATED form emitted by the current Logging.h/Logging.cxx:
+    #       [LOG-<level>] [in <scope>]: body
+    #     Captured as the bare "<scope>: " so sidecars stay comparable with
+    #     ones captured before the format change. Kept in lockstep with
+    #     normalize.sed rule (1c); if that rule changes, change this too.
+    grep -oE '^\[LOG-(trace|debug|info|warning|error|critical)\] \[in [^]]*\]: ' "$raw_file" 2>/dev/null \
+      | sed -E 's/^\[LOG-[a-z]+\] \[in //; s/\]: /: /'
+    # (b) UNCONFIGURED-logger form (lar::log::setup() never called): same, but
+    #     with spdlog's default timestamp+level decoration in front.
+    grep -oE '^\[[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:.]+\] \[(trace|debug|info|warning|error|critical)\] \[in [^]]*\]: ' "$raw_file" 2>/dev/null \
+      | sed -E 's/^.*\[in //; s/\]: /: /'
+    # (c) LEGACY bare form (normalize.sed rule 2), with the same exclusion list
+    #     that rule uses so the sidecar reflects exactly what gets stripped.
+    grep -oE '^[A-Za-z_][A-Za-z0-9_:<>~,() ]*: ' "$raw_file" 2>/dev/null \
+      | grep -vE '^(Info in <|Environment variable|Working Directory:|Test timeout computed to be:|Test selection:|Geometry file:|Running on detector:|Comparing two wires|Returned wire would be:)'
+  } | sort | uniq -c | sort -rn
 }
 
 baseline_path() { echo "$BASELINE_DIR/$1.txt"; }
@@ -203,16 +231,26 @@ do_check_one() {
   cur="$(mktemp)"
   printf '%s\n' "$norm" > "$cur"
 
+  # Reapply the current normalization rules to stored baselines as well as
+  # current captures. Baselines may have been created before a newly approved
+  # normalization rule was added (for example, the MessageFacility started. ->
+  # Logging started. rename); applying the rules only to the current side
+  # would make an approved equivalent change appear different until every
+  # baseline was destructively regenerated.
+  local base_norm
+  base_norm="$(mktemp)"
+  sed -E -f "$NORMALIZE_SED" "$bpath" > "$base_norm"
+
   local difftmp
   difftmp="$(mktemp)"
-  if diff -u "$bpath" "$cur" > "$difftmp"; then
+  if diff -u "$base_norm" "$cur" > "$difftmp"; then
     echo "outdiff check: $test -- MATCH"
-    rm -f "$cur" "$rpath" "$difftmp"
+    rm -f "$cur" "$rpath" "$base_norm" "$difftmp"
     return 0
   else
     echo "outdiff check: $test -- DIFFERS"
     cat "$difftmp"
-    rm -f "$cur" "$rpath" "$difftmp"
+    rm -f "$cur" "$rpath" "$base_norm" "$difftmp"
     return 1
   fi
 }
@@ -238,22 +276,46 @@ do_levels_one() {
   local craw
   craw="$(mktemp)"
   run_test_raw "$test" | extract_body > "$craw"
-  echo "  -- current level counts (from %MSG-<x> banners) --"
+
+  # Current-side counts come from EITHER form:
+  #  - pre-migration, still-mf code:  %MSG-<x> banners (as the baseline);
+  #  - migrated code: the "[LOG-<level>]" record prefix emitted by the current
+  #    Logging.cxx pattern ("[LOG-%l] %v").
+  # The second case is why this check is now a real comparison rather than the
+  # no-op it was under the earlier bare-%v pattern: the level IS recoverable
+  # from migrated output, so a silently vanished trace/debug level
+  # (PATTERN_CATALOG.md §4.2 -- "the most likely invisible regression") is
+  # caught here directly instead of only indirectly via the body diff.
+  #
+  # spdlog level names are mapped onto mf's severity letters so the two sides
+  # are comparable. Mapping (mf letter <- spdlog level):
+  #     i <- info          w <- warning      e <- error
+  #     d <- debug, trace  s <- critical
+  # mf emits both debug and trace as %MSG-d, so they are merged here too;
+  # that makes this check conservative (it cannot tell trace from debug), and
+  # the authoritative per-message detector remains `outdiff.sh check`.
+  echo "  -- current level counts (from %MSG-<x> banners and/or [LOG-<level>]) --"
   local cur_counts
-  cur_counts="$(grep -oE '^%MSG-[a-zA-Z] ' "$craw" | sort | uniq -c || true)"
-  if [[ -z "$cur_counts" ]]; then
+  cur_counts="$(
+    {
+      grep -oE '^%MSG-[a-zA-Z] ' "$craw" 2>/dev/null | sed -E 's/^%MSG-([a-zA-Z]) /\1/'
+      grep -oE '^\[LOG-(trace|debug|info|warning|error|critical)\] ' "$craw" 2>/dev/null \
+        | sed -E 's/^\[LOG-//; s/\] $//' \
+        | sed -E 's/^info$/i/; s/^warning$/w/; s/^error$/e/; s/^debug$/d/; s/^trace$/d/; s/^critical$/s/'
+    } | sort | uniq -c || true
+  )"
+  # Re-render to the "%MSG-<x> " shape the baseline side uses, so the
+  # comparison loop below sees identical labels on both sides.
+  cur_counts="$(echo "$cur_counts" | awk 'NF==2 {printf "%7d %%MSG-%s \n", $1, $2}')"
+  if [[ -z "${cur_counts//[[:space:]]/}" ]]; then
     echo "     none found."
-    echo "     LIMITATION: under the resolved bare-%v pattern (OPEN_QUESTION_ANSWERS.md"
-    echo "     §1), fully-migrated spdlog output carries no level indicator in the"
-    echo "     text, so a per-level count cannot be recovered here. This is EXPECTED"
-    echo "     once this test's code is migrated, not a failure of this check."
-    echo "     Use 'outdiff.sh check $test' (the full body diff) as the authoritative"
-    echo "     detector for a vanished message at any level: a message that stopped"
-    echo "     being emitted shows up there as a missing line regardless of level."
-    rm -f "$craw"
-    return 0
+    echo "     This means the test emitted NO level-tagged records at all, in"
+    echo "     either format. If the baseline had records, the comparison below"
+    echo "     will FAIL -- which is the intended behaviour, not a limitation."
+    cur_counts=""
+  else
+    echo "$cur_counts" | sed 's/^/     /'
   fi
-  echo "$cur_counts" | sed 's/^/     /'
 
   # Compare: any baseline level with count>0 that is now 0 or absent is a FAIL.
   local fail=0

@@ -47,6 +47,60 @@ s/^(\x1b\[[0-9;]*m)+//
 /^%MSG-[a-zA-Z] /d
 /^%MSG$/d
 
+# (1b) Normalize the approved setup-message rename:
+#       messagefacility: "MessageFacility started."
+#       spdlog:          "Logging started."
+#     This is an intentional migration-only wording change approved during
+#     Gate B. It is not a diagnostic body, and treating both forms as the same
+#     canonical text keeps historical pre-migration baselines useful without
+#     hiding any other output change.
+s/^MessageFacility started\.$/<LOGGING_STARTED>/
+s/^Logging started\.$/<LOGGING_STARTED>/
+s/^.*SetupMessageFacility: Logging started\.$/<LOGGING_STARTED>/
+
+# (1c) Strip the DECORATED spdlog record prefix produced by the current
+#      Logging.h/Logging.cxx format:
+#        [LOG-<level>] [in <scope::name>]: <body>   ->  <body>
+#        [LOG-<level>] [in ?]: <body>               ->  <body>
+#      (Logging.cxx sets pattern "[LOG-%l] %v"; Logging.h emits
+#       "[in {}]: {}" / "[in ?]: {}".)
+#
+#      MUST run BEFORE rule (2): a line starting with '[' never matches rule
+#      (2)'s leading-identifier anchor, so without this rule the decorated
+#      prefix survives normalization entirely and EVERY migrated message
+#      differs from its pre-migration baseline.
+#
+#      spdlog's %l spells the levels: trace, debug, info, warning, error,
+#      critical (verified against the installed spdlog 1.12, not assumed --
+#      note "warning"/"error", NOT "warn"/"err").
+#
+#      Only the FIRST line of a multi-line record carries this decoration;
+#      continuation lines are emitted bare (verified), so they are left alone
+#      and compare directly against the mf-era continuation lines.
+#
+#      The level is deliberately NOT preserved in the normalized body: the
+#      pre-migration mf baselines carry severity only in the %MSG banner that
+#      rule (1) deletes, so keeping it here would make every migrated line
+#      differ. Level is checked separately and more precisely by
+#      `outdiff.sh levels`, which reads the level out of the RAW capture.
+#
+#      The scope is captured to the prefix sidecar by outdiff.sh before
+#      normalization (PATTERN_CATALOG.md §2.4: a WRONG prefix is a real
+#      defect worth seeing), exactly as for rule (2).
+s/^\[LOG-(trace|debug|info|warning|error|critical)\] \[in [^]]*\]: //
+
+# (1d) GUARD: an UNCONFIGURED spdlog default logger (i.e. lar::log::setup()
+#      never called) emits its own default pattern, which carries a
+#      NON-DETERMINISTIC timestamp:
+#        [2026-10-07 15:44:31.855] [info] [in geo::A::f]: body
+#      Verified against installed spdlog 1.12. Such a line would differ on
+#      every single run. Normalize the timestamp+level decoration to a visible
+#      marker rather than deleting it silently: if <UNCONFIGURED_LOGGER>
+#      appears in a diff, the test is logging before/without setup() and the
+#      init shim is missing -- a real finding (PATTERN_CATALOG.md §4.2), not
+#      noise to be hidden.
+s/^\[[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\] \[(trace|debug|info|warning|error|critical)\] \[in [^]]*\]: /<UNCONFIGURED_LOGGER> /
+
 # (2) Strip a bare spdlog scoped-name prefix line-start, e.g.:
 #       geo::WireReadoutGeom::ChannelsIntersect: channel 7 maps to no wire
 #     -> channel 7 maps to no wire
