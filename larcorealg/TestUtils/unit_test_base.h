@@ -16,7 +16,7 @@
  *
  * This is a pure template header. It will require the following libraries:
  *
- * * `MF_MessageLogger`
+ * * `larcoreobj::LoggingUtil`
  * * `fhiclcpp`
  * * `cetlib`
  *
@@ -38,7 +38,7 @@
 #include "fhiclcpp/types/Comment.h"
 #include "fhiclcpp/types/Name.h"
 #include "fhiclcpp/types/Table.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // CET libraries
 #include "cetlib/filepath_maker.h"
@@ -1024,7 +1024,7 @@ namespace testing {
   template <typename ConfigurationClass>
   BasicTesterEnvironment<ConfigurationClass>::~BasicTesterEnvironment()
   {
-    mf::LogInfo("Test") << config.ApplicationName() << " completed.";
+    LAR_LOG_INFO << config.ApplicationName() << " completed.";
   }
 
   /** **************************************************************************
@@ -1091,29 +1091,27 @@ namespace testing {
     fhicl::ParameterSet const& pset,
     std::string appl_name /* = "" */) const
   {
-    fhicl::ParameterSet mf_pset;
+    fhicl::ParameterSet logging_pset;
 
-    if (!pset.get_if_present(config.ServiceParameterSetPath("message"), mf_pset)) {
-      mf_pset = CompileParameterSet(config.DefaultServiceConfiguration("message"));
+    if (!pset.get_if_present(config.ServiceParameterSetPath("message"), logging_pset)) {
+      logging_pset = CompileParameterSet(config.DefaultServiceConfiguration("message"));
       std::cout << "Using default message facility configuration:\n"
-                << mf_pset.to_indented_string(1) << std::endl;
+                << logging_pset.to_indented_string(1) << std::endl;
     } // if no configuration is available
 
-    mf::StartMessageFacility(mf_pset);
-    if (!appl_name.empty()) mf::SetApplicationName(appl_name);
-    mf::SetContextIteration("Initialization");
+    (void)logging_pset;
+    ::lar::log::setup(appl_name.empty() ? config.ApplicationName() : appl_name,
+                      spdlog::level::trace);
     if (options.MessageLevels) {
-      std::cout << "Printing message levels in 'MessageFacility' category." << std::endl;
+      std::cout << "Printing configured logging levels." << std::endl;
 
-      mf::LogProblem("MessageFacility") << "Error messages are shown.";
-      mf::LogPrint("MessageFacility") << "Warning messages are shown.";
-      mf::LogVerbatim("MessageFacility") << "Info messages are shown.";
-      mf::LogTrace("MessageFacility") << "Debug messages are shown.";
-      MF_LOG_TRACE("MessageFacility")
-        << "MF_LOG_TRACE/MF_LOG_DEBUG messages are not compiled away.";
+      LAR_LOG_ERROR << "Error messages are shown.";
+      LAR_LOG_WARNING << "Warning messages are shown.";
+      LAR_LOG_INFO << "Info messages are shown.";
+      LAR_LOG_DEBUG << "Debug messages are shown.";
+      LAR_LOG_TRACE << "Trace messages are shown.";
     } // if print message levels
-    mf::LogInfo("MessageFacility") << "MessageFacility started.";
-    mf::SetContextSinglet("main");
+    LAR_LOG_INFO << "<LOGGING_STARTED>";
   }
 
   template <typename ConfigurationClass>
@@ -1125,7 +1123,7 @@ namespace testing {
 
     // Optionally print the configuration
     {
-      mf::LogInfo msg("Configuration");
+      auto msg = LAR_LOG_INFO;
       msg << "Complete configuration (";
       if (config.ConfigurationPath().empty())
         msg << "default";
@@ -1133,7 +1131,7 @@ namespace testing {
         msg << "'" << config.ConfigurationPath() << "'";
       msg << "):\n" << Parameters().to_indented_string(1);
     }
-    mf::LogInfo("Test") << config.ApplicationName() << " base setup complete.";
+    LAR_LOG_INFO << config.ApplicationName() << " base setup complete.";
   }
 
   template <typename ConfigurationClass>

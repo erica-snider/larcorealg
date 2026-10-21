@@ -14,7 +14,7 @@ cet_make_library(LIBRARY_NAME unit_test_base INTERFACE
   SOURCE unit_test_base.h
   LIBRARIES INTERFACE
   larcorealg::ProviderTestHelpers
-  messagefacility::MF_MessageLogger
+  larcoreobj::LoggingUtil
   fhiclcpp::types
   fhiclcpp::fhiclcpp
   cetlib::cetlib
@@ -33,7 +33,6 @@ cet_make_library(LIBRARY_NAME geometry_unit_test_base INTERFACE
   larcorealg::CoreUtils
   larcorealg::unit_test_base
   larcorealg::Geometry
-  messagefacility::MF_MessageLogger
   larcorealg::CoreUtils
 )
 

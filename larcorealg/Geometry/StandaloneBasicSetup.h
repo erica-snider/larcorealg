@@ -31,7 +31,7 @@
 // utility libraries
 #include "cetlib/filepath_maker.h" // cet::filepath_lookup_after1
 #include "fhiclcpp/ParameterSet.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // C/C++ standard libraries
 #include <string>
@@ -71,17 +71,12 @@ namespace lar {
 
     //--------------------------------------------------------------------------
     /**
-     * @brief Sets up the message facility service.
+ * @brief Sets up logging for a standalone application.
      * @param pset global configuration parameter set
      * @param applName (default: `"standalone"`) name of running the application
      *
-     * The configuration is read from the path `services.message` (as for the
-     * standard _art_ behaviour). Any configuration working in _art_ is expected
-     * to work here as well.
-     *
-     * Technical details:
-     * * "context singlet" is set to `main` (`mf::SetContextSinglet()`)
-     * * "context iteration" is set to empty (`mf::SetContextIteration()`)
+     * The legacy FHiCL parameter set is retained in the interface for callers
+     * during the migration; logging uses the shared spdlog setup shim.
      */
     void SetupMessageFacility(fhicl::ParameterSet const& pset, std::string applName = "standalone");
 
@@ -113,10 +108,8 @@ inline fhicl::ParameterSet lar::standalone::ParseConfiguration(std::string confi
 inline void lar::standalone::SetupMessageFacility(fhicl::ParameterSet const& pset,
                                                   std::string applName /* = "standalone" */)
 {
-  mf::StartMessageFacility(pset.get<fhicl::ParameterSet>("services.message"));
-  mf::SetApplicationName(applName);
-  mf::SetContextSinglet("main");
-  mf::SetContextIteration("");
+   (void)pset;
+   ::lar::log::setup(applName, spdlog::level::debug);
 } // lar::standalone::SetupMessageFacility()
 
 //------------------------------------------------------------------------------

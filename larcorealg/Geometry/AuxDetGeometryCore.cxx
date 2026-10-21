@@ -19,7 +19,7 @@
 // Framework includes
 #include "cetlib_except/exception.h"
 #include "fhiclcpp/types/Table.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // ROOT includes
 #include "TGeoManager.h"
@@ -94,7 +94,7 @@ namespace geo {
 
     ApplyChannelMap();
 
-    mf::LogInfo("AuxDetGeometryCore") << "New detector geometry loaded from\n\t" << fGDMLfile;
+    LAR_LOG_INFO << "New detector geometry loaded from\n\t" << fGDMLfile;
   }
 
   //......................................................................

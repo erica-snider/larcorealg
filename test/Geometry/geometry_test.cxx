@@ -24,7 +24,7 @@
 
 // art libraries
 #include "fhiclcpp/ParameterSet.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 //------------------------------------------------------------------------------
 //---  The test environment
@@ -102,7 +102,7 @@ int main(int argc, char const** argv)
   unsigned int nErrors = Tester.Run();
 
   // 3. And finally we cross fingers.
-  if (nErrors > 0) { mf::LogError("geometry_test") << nErrors << " errors detected!"; }
+  if (nErrors > 0) { LAR_LOG_ERROR << nErrors << " errors detected!"; }
 
   return nErrors;
 } // main()

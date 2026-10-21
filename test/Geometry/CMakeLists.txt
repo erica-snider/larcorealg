@@ -38,10 +38,10 @@ cet_make_library(LIBRARY_NAME GeometryTestLib USE_PROJECT_NAME USE_BOOST_UNIT
   larcorealg::geo
   larcorealg::geo_vectors_utils
   larcoreobj::SimpleTypesAndConstants
-  messagefacility::MF_MessageLogger
   cetlib::cetlib
   cetlib_except::cetlib_except
   ROOT::Core
+  fmt::fmt
 )
 
 # geometry test on "standard" geometry
@@ -56,6 +56,7 @@ cet_test(geometry_iterator_test USE_BOOST_UNIT
   larcorealg::Geometry
   larcorealg::GeometryTestLib
   larcorealg::geometry_unit_test_base
+  larcoreobj::LoggingUtil
 )
 
 # unit test (use geometry configuration from config file, the rest is ignored)
@@ -68,6 +69,7 @@ cet_test(geometry_geoid_test USE_BOOST_UNIT
   larcorealg::Geometry
   larcorealg::GeometryTestLib
   larcorealg::geometry_unit_test_base
+  larcoreobj::LoggingUtil
 )
 
 # unit test (use the hard-coded channel mapping for "standard" LArTPCdetector)
@@ -79,6 +81,7 @@ cet_test(geometry_test
   larcorealg::Geometry
   larcorealg::GeometryTestLib
   larcorealg::geometry_unit_test_base
+  larcoreobj::LoggingUtil
 )
 
 # test of standalone geometry loading (use the hard-coded channel mapping for "standard" LArTPCdetector)
@@ -89,7 +92,7 @@ cet_test(geometry_loader_test
   LIBRARIES PRIVATE
   larcorealg::GeometryTestLib
   larcorealg::Geometry
-  messagefacility::MF_MessageLogger
+  larcoreobj::LoggingUtil
   fhiclcpp::fhiclcpp
 )
 
@@ -102,7 +105,7 @@ cet_test(geometry_iterator_loop_test
   larcorealg::Geometry
   larcorealg::GeometryTestLib
   larcorealg::geometry_unit_test_base
-  messagefacility::MF_MessageLogger
+  larcoreobj::LoggingUtil
 )
 
 
@@ -115,6 +118,7 @@ cet_test(geometry_standardchannelmapping_test USE_BOOST_UNIT
   larcorealg::Geometry
   larcorealg::GeometryTestLib
   larcorealg::geometry_unit_test_base
+  larcoreobj::LoggingUtil
 )
 
 

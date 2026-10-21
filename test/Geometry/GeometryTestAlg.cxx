@@ -34,7 +34,7 @@
 #include "cetlib/pow.h"
 #include "cetlib_except/exception.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // ROOT includes
 #include "Math/GenVector/DisplacementVector3D.h"
@@ -129,7 +129,7 @@ namespace geo {
     std::ostringstream sstr;
     fRunTests.PrintConfiguration(sstr);
 
-    mf::LogInfo("GeometryTestAlg") << "Test selection:" << sstr.str();
+    LAR_LOG_INFO << "Test selection:" << sstr.str();
 
   } // GeometryTestAlg::GeometryTestAlg()
 
@@ -148,190 +148,190 @@ namespace geo {
     //
     // Version 1.1:
     //   more TPC information when printing all geometry
-    mf::LogVerbatim("GeometryTest") << "GeometryTest version 1.1";
+    LAR_LOG_INFO << "GeometryTest version 1.1";
 
-    mf::LogInfo("GeometryTestInfo") << "Running on detector: '" << geom->DetectorName() << "'";
+    LAR_LOG_INFO << "Running on detector: '" << geom->DetectorName() << "'";
 
-    mf::LogVerbatim("GeometryTest") << "  Running on detector: '" << geom->DetectorName() << "'"
-                                    << "\nGeometry file: " << geom->GDMLFile();
+    LAR_LOG_INFO << "  Running on detector: '" << geom->DetectorName() << "'"
+                 << "\nGeometry file: " << geom->GDMLFile();
 
     try {
       if (shouldRunTests("DetectorIntro")) {
-        MF_LOG_INFO("GeometryTest") << "detector introduction:";
+        LAR_LOG_INFO << "detector introduction:";
         printDetectorIntro();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("CheckOverlaps")) {
-        MF_LOG_INFO("GeometryTest") << "test for overlaps ...";
+        LAR_LOG_INFO << "test for overlaps ...";
         gGeoManager->CheckOverlaps(1e-5);
         gGeoManager->PrintOverlaps();
         if (!gGeoManager->GetListOfOverlaps()->IsEmpty()) {
-          mf::LogError("GeometryTest") << gGeoManager->GetListOfOverlaps()->GetSize()
-                                       << " overlaps found in geometry during overlap test!";
+          LAR_LOG_ERROR << gGeoManager->GetListOfOverlaps()->GetSize()
+                        << " overlaps found in geometry during overlap test!";
           ++nErrors;
         }
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("ThoroughCheck")) {
-        MF_LOG_INFO("GeometryTest") << "thorough geometry test ...";
+        LAR_LOG_INFO << "thorough geometry test ...";
         gGeoManager->CheckGeometryFull();
         if (!gGeoManager->GetListOfOverlaps()->IsEmpty()) {
-          mf::LogError("GeometryTest") << gGeoManager->GetListOfOverlaps()->GetSize()
-                                       << " overlaps found in geometry during thorough test!";
+          LAR_LOG_ERROR << gGeoManager->GetListOfOverlaps()->GetSize()
+                        << " overlaps found in geometry during thorough test!";
           ++nErrors;
         }
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("Cryostat")) {
-        MF_LOG_INFO("GeometryTest") << "test Cryostat methods ...";
+        LAR_LOG_INFO << "test Cryostat methods ...";
         testCryostat();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("FindVolumes")) {
-        MF_LOG_INFO("GeometryTest") << "test FindAllVolumes method ...";
+        LAR_LOG_INFO << "test FindAllVolumes method ...";
         testFindVolumes();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("PlaneDirections")) {
-        MF_LOG_INFO("GeometryTest") << "test plane directions...";
+        LAR_LOG_INFO << "test plane directions...";
         testPlaneDirections();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("WireOrientations")) {
-        MF_LOG_INFO("GeometryTest") << "test wire orientations...";
+        LAR_LOG_INFO << "test wire orientations...";
         testWireOrientations();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("ChannelToROP")) {
-        MF_LOG_INFO("GeometryTest") << "test channel to ROP and back ...";
+        LAR_LOG_INFO << "test channel to ROP and back ...";
         testChannelToROP();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("ChannelToWire")) {
-        MF_LOG_INFO("GeometryTest") << "test channel to plane wire and back ...";
+        LAR_LOG_INFO << "test channel to plane wire and back ...";
         testChannelToWire();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("FindPlaneCenters")) {
-        MF_LOG_INFO("GeometryTest") << "test find plane centers...";
+        LAR_LOG_INFO << "test find plane centers...";
         testFindPlaneCenters();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("WireCoordFromPlane")) {
-        MF_LOG_INFO("GeometryTest") << "test PlaneGeo::WireCoordinate...";
+        LAR_LOG_INFO << "test PlaneGeo::WireCoordinate...";
         testWireCoordFromPlane();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("ParallelWires")) {
-        MF_LOG_INFO("GeometryTest") << "test wire parallelism...";
+        LAR_LOG_INFO << "test wire parallelism...";
         testParallelWires();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("PlanePointDecomposition")) {
-        MF_LOG_INFO("GeometryTest") << "test plane point decomposition...";
+        LAR_LOG_INFO << "test plane point decomposition...";
         testPlanePointDecomposition();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("PlaneProjections")) {
-        MF_LOG_INFO("GeometryTest") << "test PlaneGeo::PointProjection...";
+        LAR_LOG_INFO << "test PlaneGeo::PointProjection...";
         testPlaneProjection();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("WireCoordAngle")) {
-        MF_LOG_INFO("GeometryTest") << "testWireCoordAngle...";
+        LAR_LOG_INFO << "testWireCoordAngle...";
         testWireCoordAngle();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("Projection")) {
-        MF_LOG_INFO("GeometryTest") << "testProject...";
+        LAR_LOG_INFO << "testProject...";
         testProject();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("WirePos")) {
-        MF_LOG_INFO("GeometryTest") << "testWirePos...";
+        LAR_LOG_INFO << "testWirePos...";
         // There is a contradiction here, and these must be tested differently
         // Testing based on detector ID should NOT become common practice
-        MF_LOG_INFO("GeometryTest") << "disabled.";
+        LAR_LOG_INFO << "disabled.";
       }
 
       if (shouldRunTests("NearestWire")) {
-        MF_LOG_INFO("GeometryTest") << "testNearestWire...";
+        LAR_LOG_INFO << "testNearestWire...";
         testNearestWire();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("WireIntersection")) {
-        MF_LOG_INFO("GeometryTest") << "testWireIntersection...";
+        LAR_LOG_INFO << "testWireIntersection...";
         testWireIntersection();
-        MF_LOG_INFO("GeometryTest") << "testWireIntersection complete";
+        LAR_LOG_INFO << "testWireIntersection complete";
       }
 
       if (shouldRunTests("ThirdPlane")) {
-        MF_LOG_INFO("GeometryTest") << "testThirdPlane...";
+        LAR_LOG_INFO << "testThirdPlane...";
         testThirdPlane();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("ThirdPlaneSlope")) {
-        MF_LOG_INFO("GeometryTest") << "testThirdPlaneSlope...";
+        LAR_LOG_INFO << "testThirdPlaneSlope...";
         testThirdPlane_dTdW();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("WirePitch")) {
-        MF_LOG_INFO("GeometryTest") << "testWirePitch...";
+        LAR_LOG_INFO << "testWirePitch...";
         testWirePitch();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("InterWireProjectedDistance")) {
-        MF_LOG_INFO("GeometryTest") << "testInterWireProjectedDistance...";
+        LAR_LOG_INFO << "testInterWireProjectedDistance...";
         testInterWireProjectedDistance();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("PlanePitch")) {
-        MF_LOG_INFO("GeometryTest") << "testPlanePitch...";
+        LAR_LOG_INFO << "testPlanePitch...";
         testPlanePitch();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("Stepping")) {
-        MF_LOG_INFO("GeometryTest") << "testStepping...";
+        LAR_LOG_INFO << "testStepping...";
         testStepping();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("FindAuxDet")) {
-        MF_LOG_INFO("GeometryTest") << "testFindAuxDet...";
+        LAR_LOG_INFO << "testFindAuxDet...";
         testFindAuxDet();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
 
       if (shouldRunTests("PrintWires")) {
-        MF_LOG_INFO("GeometryTest") << "printAllGeometry...";
+        LAR_LOG_INFO << "printAllGeometry...";
         printAllGeometry();
-        MF_LOG_INFO("GeometryTest") << "complete.";
+        LAR_LOG_INFO << "complete.";
       }
     }
     catch (cet::exception& e) {
-      mf::LogWarning("GeometryTest") << "exception caught: \n" << e;
+      LAR_LOG_WARNING << "exception caught: \n" << e;
       if (fNonFatalExceptions.count(e.category()) == 0) throw;
     }
 
@@ -341,7 +341,7 @@ namespace geo {
                                            << out.str();
     }
 
-    mf::LogInfo log("GeometryTest");
+    auto log = LAR_LOG_INFO;
     log << "Tests completed:";
     auto tests_run = fRunTests.AcceptedNames();
     if (tests_run.empty()) { log << "\n  no test run"; }
@@ -364,7 +364,7 @@ namespace geo {
   void GeometryTestAlg::printDetectorIntro() const
   {
     WireGeo const& testWire = wireReadoutGeom->Wire(WireID(0, 0, 1, 10));
-    mf::LogVerbatim log("GeometryTest");
+    auto log = LAR_LOG_INFO;
     log << "Wire Rmax  " << testWire.RMax() << "\nWire length " << 2. * testWire.HalfL()
         << "\nWire Rmin  " << testWire.RMin();
 
@@ -386,25 +386,24 @@ namespace geo {
     for (auto const& cryostat : geom->Iterate<CryostatGeo>()) {
       auto const world = cryostat.toWorldCoords(cryo_origin);
 
-      mf::LogVerbatim("GeometryTest") << "Cryo " << cryostat.ID();
-      mf::LogVerbatim("GeometryTest") << "    -x: " << world.X() - cryostat.HalfWidth();
-      mf::LogVerbatim("GeometryTest") << "    +x: " << world.X() + cryostat.HalfWidth();
-      mf::LogVerbatim("GeometryTest") << "    -y: " << world.Y() - cryostat.HalfHeight();
-      mf::LogVerbatim("GeometryTest") << "    +y: " << world.Y() + cryostat.HalfHeight();
-      mf::LogVerbatim("GeometryTest") << "    -z: " << world.Z() - cryostat.Length() / 2;
-      mf::LogVerbatim("GeometryTest") << "    +z: " << world.Z() + cryostat.Length() / 2;
+      LAR_LOG_INFO << "Cryo " << cryostat.ID();
+      LAR_LOG_INFO << "    -x: " << world.X() - cryostat.HalfWidth();
+      LAR_LOG_INFO << "    +x: " << world.X() + cryostat.HalfWidth();
+      LAR_LOG_INFO << "    -y: " << world.Y() - cryostat.HalfHeight();
+      LAR_LOG_INFO << "    -z: " << world.Z() - cryostat.Length() / 2;
+      LAR_LOG_INFO << "    +z: " << world.Z() + cryostat.Length() / 2;
 
       TPCGeo::LocalPoint_t const tpc_origin{};
       for (unsigned int t = 0; t < geom->NTPC(cryostat.ID()); ++t) {
         auto const world = cryostat.TPC(t).toWorldCoords(tpc_origin);
 
-        mf::LogVerbatim("GeometryTest") << "  TPC " << t;
-        mf::LogVerbatim("GeometryTest") << "    -x: " << world.X() - cryostat.TPC(t).HalfWidth();
-        mf::LogVerbatim("GeometryTest") << "    +x: " << world.X() + cryostat.TPC(t).HalfWidth();
-        mf::LogVerbatim("GeometryTest") << "    -y: " << world.Y() - cryostat.TPC(t).HalfHeight();
-        mf::LogVerbatim("GeometryTest") << "    +y: " << world.Y() + cryostat.TPC(t).HalfHeight();
-        mf::LogVerbatim("GeometryTest") << "    -z: " << world.Z() - cryostat.TPC(t).Length() / 2;
-        mf::LogVerbatim("GeometryTest") << "    +z: " << world.Z() + cryostat.TPC(t).Length() / 2;
+        LAR_LOG_INFO << "  TPC " << t;
+        LAR_LOG_INFO << "    -x: " << world.X() - cryostat.TPC(t).HalfWidth();
+        LAR_LOG_INFO << "    +x: " << world.X() + cryostat.TPC(t).HalfWidth();
+        LAR_LOG_INFO << "    -y: " << world.Y() - cryostat.TPC(t).HalfHeight();
+        LAR_LOG_INFO << "    +y: " << world.Y() + cryostat.TPC(t).HalfHeight();
+        LAR_LOG_INFO << "    -z: " << world.Z() - cryostat.TPC(t).Length() / 2;
+        LAR_LOG_INFO << "    +z: " << world.Z() + cryostat.TPC(t).Length() / 2;
       }
     }
   }
@@ -414,16 +413,16 @@ namespace geo {
   void GeometryTestAlg::printDetDim()
   {
     for (auto const& cryo : geom->Iterate<CryostatGeo>()) {
-      mf::LogVerbatim("GeometryTest") << "Cryo " << cryo.ID();
-      mf::LogVerbatim("GeometryTest") << "    width: " << cryo.HalfWidth();
-      mf::LogVerbatim("GeometryTest") << "    height: " << cryo.HalfHeight();
-      mf::LogVerbatim("GeometryTest") << "    length: " << cryo.Length();
+      LAR_LOG_INFO << "Cryo " << cryo.ID();
+      LAR_LOG_INFO << "    width: " << cryo.HalfWidth();
+      LAR_LOG_INFO << "    height: " << cryo.HalfHeight();
+      LAR_LOG_INFO << "    length: " << cryo.Length();
 
       auto const& tpc = geom->TPC({cryo.ID(), 0});
-      mf::LogVerbatim("GeometryTest") << "  TPC 0";
-      mf::LogVerbatim("GeometryTest") << "    width: " << tpc.HalfWidth();
-      mf::LogVerbatim("GeometryTest") << "    height: " << tpc.HalfHeight();
-      mf::LogVerbatim("GeometryTest") << "    length: " << tpc.Length();
+      LAR_LOG_INFO << "  TPC 0";
+      LAR_LOG_INFO << "    width: " << tpc.HalfWidth();
+      LAR_LOG_INFO << "    height: " << tpc.HalfHeight();
+      LAR_LOG_INFO << "    length: " << tpc.Length();
     }
   }
 
@@ -450,12 +449,12 @@ namespace geo {
   // great insanity: print all wires in a TPC
   void GeometryTestAlg::printWiresInTPC(TPCGeo const& tpc, std::string indent /* = "" */) const
   {
-    tpc.PrintTPCInfo(mf::LogVerbatim("GeometryTest") << indent, indent, TPCGeo::MaxVerbosity);
+    tpc.PrintTPCInfo(LAR_LOG_INFO << indent, indent, TPCGeo::MaxVerbosity);
 
     for (PlaneGeo const& plane : wireReadoutGeom->Iterate<PlaneGeo>(tpc.ID())) {
       unsigned const int nWires = plane.Nwires();
 
-      plane.PrintPlaneInfo(mf::LogVerbatim("GeometryTest") << indent << "  ",
+      plane.PrintPlaneInfo(LAR_LOG_INFO << indent << "  ",
                            indent + "      ",
                            8 /* large verbosity */
       );
@@ -469,7 +468,7 @@ namespace geo {
 
         // the wire should be aligned on z axis, half on each side of 0, in its local
         // frame
-        mf::LogVerbatim("GeometryTest")
+        LAR_LOG_INFO
           << indent << "    wire #" << w << " at " << lar::dump::array<3>(center) << "\n"
           << indent << "       start at " << lar::dump::vector3D(wire.GetStart()) << "\n"
           << indent << "      middle at " << lar::dump::vector3D(wire.GetCenter()) << "\n"
@@ -481,11 +480,11 @@ namespace geo {
   void GeometryTestAlg::printAllGeometry() const
   {
     unsigned const int nCryostats = geom->Ncryostats();
-    mf::LogVerbatim("GeometryTest")
+    LAR_LOG_INFO
       << "Detector " << geom->DetectorName() << " has " << nCryostats << " cryostats:";
     for (auto const& cryostat : geom->Iterate<CryostatGeo>()) {
       unsigned const int nTPCs = cryostat.NTPC();
-      mf::LogVerbatim("GeometryTest")
+      LAR_LOG_INFO
         << "  cryostat #" << cryostat.ID() << " at " << lar::dump::vector3D(cryostat.GetCenter())
         << " cm has " << nTPCs << " TPC(s):";
       for (unsigned int t = 0; t < nTPCs; ++t) {
@@ -494,13 +493,13 @@ namespace geo {
       } // for TPC
     }   // for cryostat
     printAuxiliaryDetectors();
-    mf::LogVerbatim("GeometryTest") << "End of detector " << geom->DetectorName() << " geometry.";
+    LAR_LOG_INFO << "End of detector " << geom->DetectorName() << " geometry.";
   }
 
   //......................................................................
   void GeometryTestAlg::printAuxiliaryDetectors() const
   {
-    mf::LogVerbatim log("GeometryTest");
+    auto log = LAR_LOG_INFO;
 
     unsigned int const nAuxDets = auxDetGeom->NAuxDets();
     log << "There are " << nAuxDets << " auxiliary detectors:";
@@ -571,13 +570,13 @@ namespace geo {
   //......................................................................
   void GeometryTestAlg::testCryostat()
   {
-    mf::LogVerbatim("GeometryTest")
+    LAR_LOG_INFO
       << "There are " << geom->Ncryostats() << " cryostats in the detector";
 
     for (auto const& cryo : geom->Iterate<CryostatGeo>()) {
 
       {
-        mf::LogVerbatim log("GeometryTest");
+        auto log = LAR_LOG_INFO;
 
         log << "\n\tCryostat " << cryo.ID() << " " << cryo.Volume()->GetName()
             << " Dimensions [cm]: " << cryo.Width() << " x " << cryo.Height() << " x "
@@ -588,13 +587,13 @@ namespace geo {
             << " +y:" << cryo.MaxY() << "  -z:" << cryo.MinZ() << " +z:" << cryo.MaxZ();
       }
 
-      MF_LOG_DEBUG("GeometryTest") << "\t testing GeometryCore::PoitionToCryostat....";
+      LAR_LOG_DEBUG << "\t testing GeometryCore::PoitionToCryostat....";
       CryostatID cid;
       try {
         cid = geom->PositionToCryostatID(cryo.GetCenter());
       }
       catch (cet::exception& e) {
-        mf::LogWarning("FailedToLocateCryostat") << "\n exception caught:" << e;
+        LAR_LOG_WARNING << "\n exception caught:" << e;
         if (fNonFatalExceptions.count(e.category()) == 0) throw;
       }
       if (cid != cryo.ID()) {
@@ -602,9 +601,9 @@ namespace geo {
           << "Geometry points the middle of cryostat " << std::string(cryo.ID())
           << " to a different one (" << std::string(cid) << ")\n";
       }
-      MF_LOG_DEBUG("GeometryTest") << "done";
+      LAR_LOG_DEBUG << "done";
 
-      MF_LOG_DEBUG("GeometryTest") << "\t Now test the TPCs associated with this cryostat";
+      LAR_LOG_DEBUG << "\t Now test the TPCs associated with this cryostat";
       testTPC(cryo.ID());
     }
   }
@@ -621,7 +620,7 @@ namespace geo {
     volume_names.insert(geom->GetWorldVolumeName());
     nodes = geom->FindAllVolumes(volume_names);
     {
-      mf::LogVerbatim log("GeometryTest");
+      auto log = LAR_LOG_INFO;
       log << "Found " << nodes.size() << " world volumes '" << geom->GetWorldVolumeName() << "':";
       for (TGeoNode const* node : nodes) {
         TGeoVolume const* pVolume = node->GetVolume();
@@ -630,7 +629,7 @@ namespace geo {
     }   // anonymous block
     if (nodes.size() != 1) {
       ++nErrors;
-      mf::LogError("GeometryTest") << "Found " << nodes.size() << " world volumes '"
+      LAR_LOG_ERROR << "Found " << nodes.size() << " world volumes '"
                                    << geom->GetWorldVolumeName() << "! [expecting: one!!]";
     } // if nodes
 
@@ -648,7 +647,7 @@ namespace geo {
 
     std::vector<TGeoNode const*> nodes = geom->FindAllVolumes(volume_names);
 
-    mf::LogVerbatim log("GeometryTest");
+    auto log = LAR_LOG_INFO;
     log << "Found " << nodes.size() << " world and cryostat volumes:";
     for (TGeoNode const* node : nodes) {
       TGeoVolume const* pVolume = node->GetVolume();
@@ -656,7 +655,7 @@ namespace geo {
     } // for
     if (nodes.size() != (1 + geom->Ncryostats())) {
       ++nErrors;
-      mf::LogError("GeometryTest") << "Found " << nodes.size()
+      LAR_LOG_ERROR << "Found " << nodes.size()
                                    << " world and cryostat volumes! "
                                       "[expecting: 1 world and "
                                    << geom->Ncryostats() << " cryostats]";
@@ -679,7 +678,7 @@ namespace geo {
 
     std::vector<std::vector<TGeoNode const*>> node_paths = geom->FindAllVolumePaths(volume_names);
 
-    mf::LogVerbatim log("GeometryTest");
+    auto log = LAR_LOG_INFO;
     log << "Found " << node_paths.size() << " TPC volumes:";
     for (auto const& path : node_paths) {
       TGeoNode const* node = path.back();
@@ -695,7 +694,7 @@ namespace geo {
     }   // for path
     if (node_paths.size() != NTPCs) {
       ++nErrors;
-      mf::LogError("GeometryTest") << "Found " << node_paths.size()
+      LAR_LOG_ERROR << "Found " << node_paths.size()
                                    << " TPC volumes! "
                                       "[expecting: "
                                    << NTPCs << " TPCs]";
@@ -731,13 +730,13 @@ namespace geo {
   {
     CryostatGeo const& cryo = geom->Cryostat(cid);
 
-    mf::LogVerbatim("GeometryTest") << "\tThere are " << cryo.NTPC() << " TPCs in the detector";
+    LAR_LOG_INFO << "\tThere are " << cryo.NTPC() << " TPCs in the detector";
 
     for (auto const& tpc : geom->Iterate<TPCGeo>(cid)) {
       decltype(auto) activeCenter = tpc.GetActiveVolumeCenter();
       auto const& tpcid = tpc.ID();
       {
-        mf::LogVerbatim log{"GeometryTest"};
+        auto log = LAR_LOG_INFO;
         log << "\n\t\tTPC " << tpcid << " " << tpc.ActiveVolume()->GetName() << " has "
             << wireReadoutGeom->Nplanes(tpcid) << " planes."
             << "\n\t\tTPC location: ( " << tpc.MinX() << " ; " << tpc.MinY() << " ; " << tpc.MinZ()
@@ -758,26 +757,26 @@ namespace geo {
       for (auto const& plane : wireReadoutGeom->Iterate<PlaneGeo>(tpcid)) {
         // first line indented with two tabs, the others with two more spaces; very
         // verbose (8)
-        plane.PrintPlaneInfo(mf::LogVerbatim("GeometryTest") << "\t\t", "\t\t  ", 8);
-        mf::LogVerbatim("GeometryTest") << "\t\t  pitch from plane 0 is "
+        plane.PrintPlaneInfo(LAR_LOG_INFO << "\t\t", "\t\t  ", 8);
+        LAR_LOG_INFO << "\t\t  pitch from plane 0 is "
                                         << wireReadoutGeom->Plane0Pitch(tpcid, plane.ID().Plane);
       }
 
       switch (tpc.DriftSign()) {
       case DriftSign::Negative: {
-        mf::LogVerbatim("GeometryTest")
+        LAR_LOG_INFO
           << "\t\tdrift direction is towards negative values: " << tpc.DriftDir();
         break;
       }
       case DriftSign::Positive: {
-        mf::LogVerbatim("GeometryTest")
+        LAR_LOG_INFO
           << "\t\tdrift direction is towards positive values: " << tpc.DriftDir();
         break;
       }
       default: throw cet::exception("UnknownDriftDirection") << "\t\tdrift direction is unknown\n";
       }
 
-      MF_LOG_DEBUG("GeometryTest") << "\t testing PositionToTPC...";
+      LAR_LOG_DEBUG << "\t testing PositionToTPC...";
       // pick a position in the middle of the TPC in the world coordinates
       TPCGeo::LocalPoint_t const localLoc{};
       auto const worldLoc = tpc.toWorldCoords(localLoc);
@@ -788,7 +787,7 @@ namespace geo {
         throw cet::exception("BadTPCLookupFromPosition")
           << "TPC look up returned tpc = " << tpcNo << " should be " << t << "\n";
 
-      MF_LOG_DEBUG("GeometryTest") << "done.";
+      LAR_LOG_DEBUG << "done.";
     } // for TPC
   }
 
@@ -822,7 +821,7 @@ namespace geo {
       if (coordIs.nonEqual(wireFrame, 1.0)) {
         ++nErrors;
 
-        mf::LogProblem("GeometryTestAlg")
+        LAR_LOG_ERROR
           << "Plane " << plane.ID() << " has wire direction " << wireDir
           << " wire coordinate direction " << wireCoordDir << " and normal " << planeNormal
           << " , yielding to a non-positive plane-coordinate definition"
@@ -838,7 +837,7 @@ namespace geo {
       if (coordIs.nonEqual(geoFrame, 1.0)) {
         ++nErrors;
 
-        mf::LogProblem("GeometryTestAlg")
+        LAR_LOG_ERROR
           << "Plane " << plane.ID() << " has width direction " << widthDir << " depth direction "
           << depthDir << " and normal " << planeNormal
           << " , yielding to a non-positive plane-coordinate definition"
@@ -886,7 +885,7 @@ namespace geo {
           // detail the problem; details of the plane should be read in the output from
           // other tests
           decltype(auto) wireDir = wire.Direction();
-          mf::LogProblem("GeometryTestAlg")
+          LAR_LOG_ERROR
             << "Wire " << plane.ID() << " W: " << wireNo << " has direction ( " << wireDir
             << " , yielding to a non-positive plane-coordinate definition"
             << " (l x w . n = " << positive << ")";
@@ -952,7 +951,7 @@ namespace geo {
               double const distance = plane.PlaneCoordinate(vect::toPoint(point));
 
               if (std::abs(distance - expected) > 1e-4) {
-                mf::LogProblem("GeometryTestAlg")
+                LAR_LOG_ERROR
                   << "Point " << point << "  (offset: " << iOfs << "x" << step << ", at " << iQuota
                   << "x" << jump << " from plane) is reported to be " << distance
                   << " cm far from wire " << plane.ID() << " W: " << wireNo << " (" << expected
@@ -1064,7 +1063,7 @@ namespace geo {
 
           if (vectorIs.nonEqual(point, expectedPoint)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] ComposePoint(): "
               << "Point with projection " << expectedProj << " and distance from plane " << distance
               << " was reported as " << point << " while it is expected to be at " << expectedPoint
@@ -1075,7 +1074,7 @@ namespace geo {
           auto const decomp = plane.DecomposePoint(point);
           if (coordIs.nonEqual(decomp.distance, distance)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DecomposePoint(): "
               << "Point " << point << " (on wire " << std::string(wireID) << ")"
               << " is reported to have distance from plane " << decomp.distance << " cm, while "
@@ -1083,7 +1082,7 @@ namespace geo {
           } // if wrong distance
           if (coordIs.nonEqual(decomp.projection.X(), expectedWireDirCoord)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DecomposePoint(): "
               << "Point " << point << " (on wire " << std::string(wireID) << ")"
               << " is reported to have wire direction coordinate " << decomp.projection.X()
@@ -1091,7 +1090,7 @@ namespace geo {
           } // if wrong coordinate along the wire
           if (coordIs.nonEqual(decomp.projection.Y(), expectedWireCoord)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DecomposePoint(): "
               << "Point " << point << " (on wire " << std::string(wireID) << ")"
               << " is reported to have wire coordinate " << decomp.projection.Y() << " cm, while "
@@ -1102,7 +1101,7 @@ namespace geo {
           auto const proj = plane.Projection(point);
           if (coordIs.nonEqual(proj.X(), expectedWireDirCoord)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] PointProjection(): "
               << "Point " << point << " (on wire " << std::string(wireID) << ")"
               << " is reported to have wire direction coordinate " << proj.X() << " cm, while "
@@ -1110,7 +1109,7 @@ namespace geo {
           } // if wrong wire coordinate
           if (coordIs.nonEqual(proj.Y(), expectedWireCoord)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] PointProjection(): "
               << "Point " << point << " (on wire " << std::string(wireID) << ")"
               << " is reported to have wire coordinate " << proj.Y() << " cm, while "
@@ -1121,7 +1120,7 @@ namespace geo {
           auto const dist = plane.DistanceFromPlane(point);
           if (coordIs.nonEqual(dist, distance)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DistanceFromPlane(): "
               << "Point " << point << " (on wire " << std::string(wireID) << ")"
               << " is reported to have distance " << dist << " cm from plane " << plane.ID()
@@ -1147,7 +1146,7 @@ namespace geo {
             auto dist = plane.DistanceFromPlane(point);
             if (coordIs.nonEqual(dist, expectedDistance)) {
               ++nErrors;
-              mf::LogProblem("GeometryTestAlg")
+              LAR_LOG_ERROR
                 << "[testPlanePointDecomposition] DriftPoint(): "
                 << "Point " << expectedPoint << " (distant " << distance << " cm from the plane)"
                 << " (on wire " << std::string(wireID) << ")"
@@ -1165,7 +1164,7 @@ namespace geo {
           bool const isExtremeWire = (wireID.Wire == 0) || (wireID.Wire == lastWire);
           if (!isExtremeWire && !plane.isProjectionOnPlane(expectedPoint)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] isProjectionOnPlane(): "
               << "Point " << expectedPoint << " (center of " << wireID
               << ") is not believed to be on the plane, but it should.";
@@ -1214,7 +1213,7 @@ namespace geo {
 
       WireGeo const& middle_wire = wireReadoutGeom->Wire(middle_wire_id);
       decltype(auto) middle_wire_center = middle_wire.GetCenter();
-      MF_LOG_TRACE("GeometryTest")
+      LAR_LOG_TRACE
         << "Center of " << middle_wire_id << " at " << middle_wire_center;
 
       // cross check: we can find the middle wire
@@ -1233,7 +1232,7 @@ namespace geo {
       double const pitch = plane.WirePitch();
       decltype(auto) wireCoordDir = plane.GetIncreasingWireDirection();
 
-      MF_LOG_TRACE("GeometryTest")
+      LAR_LOG_TRACE
         << "  pitch: " << pitch << " wire coord dir: cos(phi_z): " << wireCoordDir;
 
       auto on_next_wire = middle_wire_center + pitch * wireCoordDir;
@@ -1266,7 +1265,7 @@ namespace geo {
       } // if invalid rop is not invalid
     }
     catch (cet::exception const& e) {
-      mf::LogWarning("testChannelToROP")
+      LAR_LOG_WARNING
         << "Non-compilant ChannelToROP() throws on invalid channel.";
     }
 
@@ -1318,7 +1317,7 @@ namespace geo {
       }
 
       if (std::count(begin(wireIDs), end(wireIDs), testWireID) != 1) {
-        mf::LogError log("GeometryTest");
+        auto log = LAR_LOG_ERROR;
         log << wireIDs.size() << " wire IDs associated with channel #" << channel << ":";
         for (auto const& wid : wireIDs)
           log << "\n  " << wid;
@@ -1377,7 +1376,7 @@ namespace geo {
     PlaneGeo::LocalPoint_t const origin{};
     for (auto const& plane : wireReadoutGeom->Iterate<PlaneGeo>(CryostatID{0})) {
       auto const xyzW = plane.toWorldCoords(origin);
-      mf::LogVerbatim("GeometryTest") << "\n\tplane " << plane.ID() << " is centered at (x,y,z) = ("
+      LAR_LOG_INFO << "\n\tplane " << plane.ID() << " is centered at (x,y,z) = ("
                                       << xyzW.X() << "," << xyzW.Y() << "," << xyzW.Z() << ")";
     }
   }
@@ -1395,13 +1394,13 @@ namespace geo {
       auto decomp = plane.DecomposePoint(reference);
 
       if (coordIs.nonZero(decomp.distance)) {
-        MF_LOG_ERROR("GeometryTest") << "Plane " << plane.ID() << " reference point " << reference
+        LAR_LOG_ERROR << "Plane " << plane.ID() << " reference point " << reference
                                      << " has distance " << decomp.distance << " cm (should be 0)";
         ++nErrors;
       }
 
       if (coordIs.nonZero(decomp.projection.X()) || coordIs.nonZero(decomp.projection.Y())) {
-        MF_LOG_ERROR("GeometryTest")
+        LAR_LOG_ERROR
           << "Plane " << plane.ID() << " reference point " << reference << " has projection ( "
           << decomp.projection.X() << " ; " << decomp.projection.Y() << " ) cm (should be (0;0) )";
         ++nErrors;
@@ -1477,7 +1476,7 @@ namespace geo {
 
           if (vectorIs.nonEqual(point, expectedPoint)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecompositionFrame] ComposePoint(): "
               << "Point with projection " << expectedProj << " (width: " << expected_w
               << ", depth: " << expected_d << ") and distance from plane " << distance
@@ -1488,7 +1487,7 @@ namespace geo {
           auto const decomp = plane.DecomposePointWidthDepth(point);
           if (coordIs.nonEqual(decomp.distance, distance)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DecomposePointWidthDepth(): "
               << "Point " << point << " (width: " << expected_w << ", depth: " << expected_d
               << ") is reported to have distance from plane " << decomp.distance << " cm, while "
@@ -1496,7 +1495,7 @@ namespace geo {
           } // if wrong distance
           if (coordIs.nonEqual(decomp.projection.X(), expected_w)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DecomposePointWidthDepth(): "
               << "Point " << point << " (width: " << expected_w << ", depth: " << expected_d
               << ") is reported to have width direction coordinate " << decomp.projection.X()
@@ -1504,7 +1503,7 @@ namespace geo {
           } // if wrong coordinate along the wire
           if (coordIs.nonEqual(decomp.projection.Y(), expected_d)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DecomposePointWidthDepth(): "
               << "Point " << point << " (width: " << expected_w << ", depth: " << expected_d
               << ") is reported to have depth direction coordinate " << decomp.projection.Y()
@@ -1515,7 +1514,7 @@ namespace geo {
           auto const proj = plane.PointWidthDepthProjection(point);
           if (coordIs.nonEqual(proj.X(), expected_w)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] PointProjection(): "
               << "Point " << point << " (width: " << expected_w << ", depth: " << expected_d
               << ") is reported to have width direction coordinate " << proj.X() << " cm, while "
@@ -1523,7 +1522,7 @@ namespace geo {
           } // if wrong wire coordinate
           if (coordIs.nonEqual(proj.Y(), expected_d)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] PointProjectionWidthDepth(): "
               << "Point " << point << " (width: " << expected_w << ", depth: " << expected_d
               << ") is reported to have wire coordinate " << proj.Y() << " cm, while " << expected_d
@@ -1534,7 +1533,7 @@ namespace geo {
           auto const dist = plane.DistanceFromPlane(point);
           if (coordIs.nonEqual(dist, distance)) {
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecomposition] DistanceFromPlane(): "
               << "Point " << point << " (width: " << expected_w << ", depth: " << expected_d
               << ") is reported to have distance from plane " << dist << " cm, while " << distance
@@ -1560,7 +1559,7 @@ namespace geo {
             auto dist = plane.DistanceFromPlane(point);
             if (coordIs.nonEqual(dist, expectedDistance)) {
               ++nErrors;
-              mf::LogProblem("GeometryTestAlg")
+              LAR_LOG_ERROR
                 << "[testPlanePointDecomposition] DriftPoint(): "
                 << "Point " << expectedPoint << " (distant " << distance << " cm from the plane)"
                 << " (width: " << expected_w << ", depth: " << expected_d << ") drifted by "
@@ -1576,7 +1575,7 @@ namespace geo {
           if (expected_onPlane != onPlane) {
             // always
             ++nErrors;
-            mf::LogProblem("GeometryTestAlg")
+            LAR_LOG_ERROR
               << "[testPlanePointDecompositionFrame] isProjectionOnPlane(): "
               << "Point " << expectedPoint << " (width: " << expected_w << ", depth: " << expected_d
               << ") is" << (onPlane ? "" : " not") << " believed to be on plane " << plane.ID()
@@ -1644,7 +1643,7 @@ namespace geo {
             bool const onPlane = plane.isProjectionOnPlane(expected_point);
             if (expected_onPlane != onPlane) {
               ++nErrors;
-              mf::LogProblem("GeometryTestAlg")
+              LAR_LOG_ERROR
                 << "[testPlaneProjectionOnFrame] isProjectionOnPlane(): "
                 << "Point " << expected_point << " (width: " << expected_w
                 << ", depth: " << expected_d << ") is" << (onPlane ? "" : " not")
@@ -1665,7 +1664,7 @@ namespace geo {
             auto movedProjection = plane.MoveProjectionToPlane(expected_proj);
             if (vector2Dis.nonEqual(movedProjection, expected_movedProjection)) {
               ++nErrors;
-              mf::LogProblem("GeometryTestAlg")
+              LAR_LOG_ERROR
                 << "[testPlaneProjectionOnFrame] moveProjectionOnPlane():"
                 << "Projection of ooint " << expected_point << " (width: " << expected_w
                 << ", depth: " << expected_d << ") (" << (onPlane ? "on" : "off") << "-plane "
@@ -1679,7 +1678,7 @@ namespace geo {
             auto movedPoint = plane.MovePointOverPlane(expected_point);
             if (vectorIs.nonEqual(movedPoint, expected_movedPoint)) {
               ++nErrors;
-              mf::LogProblem("GeometryTestAlg")
+        LAR_LOG_ERROR
                 << "[testPlaneProjectionOnFrame] movePointOnPlane(): "
                 << "Point " << expected_point << " (width: " << expected_w
                 << ", depth: " << expected_d << ") (" << (onPlane ? "on" : "off") << "-plane "
@@ -1792,7 +1791,7 @@ namespace geo {
 
       decltype(auto) IncreasingWireDir = plane.GetIncreasingWireDirection();
 
-      MF_LOG_DEBUG("GeoTestWireCoordinate")
+      LAR_LOG_DEBUG
         << "The direction of increasing wires for plane " << planeID
         << " (theta=" << plane.Wire(0).ThetaZ() << " pitch=" << plane.WirePitch()
         << " orientation=" << (plane.Orientation() == kHorizontal ? "H" : "V")
@@ -1810,7 +1809,7 @@ namespace geo {
           nearest = wireReadoutGeom->NearestChannel(wire_center, planeID);
         }
         catch (cet::exception& e) {
-          mf::LogWarning("GeoTestCaughtException") << e;
+          LAR_LOG_WARNING << e;
           if (fNonFatalExceptions.count(e.category()) == 0) throw;
         }
 
@@ -1824,7 +1823,7 @@ namespace geo {
           }
         }
         catch (cet::exception& e) {
-          mf::LogWarning("GeoTestCaughtException") << e;
+          LAR_LOG_WARNING << e;
           if (fNonFatalExceptions.count(e.category()) == 0) throw;
         }
 
@@ -1868,7 +1867,7 @@ namespace geo {
               }
               catch (cet::exception& e) {
                 if (hasCategory(e, "NotImplemented")) {
-                  MF_LOG_ERROR("GeoTestWireCoordinate")
+                  LAR_LOG_ERROR
                     << "WireCoordinate() is not implemented for your ChannelMap;"
                        " skipping the test";
                   bTestWireCoordinate = false;
@@ -1879,7 +1878,7 @@ namespace geo {
             }
             if (bTestWireCoordinate) {
               if (std::abs(wire_from_wc - expected_wire) > 1e-3) {
-                mf::LogError("GeoTestWireCoordinate")
+                LAR_LOG_ERROR
                   << "wire " << wireID << " [center: " << wire_center << "] on step of " << i << "/"
                   << NSteps << " x" << step << " = " << delta << " cm shows " << wire_from_wc
                   << ", " << expected_wire << " expected.\n";
@@ -1902,7 +1901,7 @@ namespace geo {
                   << " expected (more precisely, " << expected_wire << ").\n";
               }
 
-              if (mf::isDebugEnabled()) {
+              if (lar::log::debugEnabled()) {
                 // In debug mode, we print a lot and we don't (fatally) complain
                 std::stringstream e;
                 e << "wire " << wireID << " [center: " << wire_center << "] on step of " << i << "/"
@@ -1911,10 +1910,10 @@ namespace geo {
                 if (wire_number_from_wc != expected_wire_number) {
                   e << ", " << expected_wire_number << " expected (more precisely, "
                     << expected_wire << ").";
-                  MF_LOG_ERROR("GeoTestWireCoordinate") << e.str();
+                  LAR_LOG_ERROR << e.str();
                 }
                 else {
-                  mf::LogVerbatim("GeoTestWireCoordinate") << e.str();
+                  LAR_LOG_DEBUG << e.str();
                 }
               }
               else if (wire_number_from_wc != expected_wire_number) {
@@ -1931,7 +1930,7 @@ namespace geo {
 
         } // try
         catch (cet::exception& e) {
-          mf::LogWarning("GeoTestCaughtException") << e;
+          LAR_LOG_WARNING << e;
           if (fNonFatalExceptions.count(e.category()) == 0) throw;
         }
 
@@ -1939,12 +1938,12 @@ namespace geo {
     }   // end loop over planes
 
     stopWatch.Stop();
-    MF_LOG_DEBUG("GeoTestWireCoordinate") << "\tdone testing closest channel";
+    LAR_LOG_DEBUG << "\tdone testing closest channel";
     stopWatch.Print();
 
     // trigger an exception with NearestChannel
-    mf::LogVerbatim("GeoTestWireCoordinate") << "\tattempt to cause an exception to be caught "
-                                             << "when looking for a nearest channel";
+    LAR_LOG_INFO << "\tattempt to cause an exception to be caught "
+                 << "when looking for a nearest channel";
 
     // pick a position out of the world
     double posWorld[3];
@@ -1958,19 +1957,19 @@ namespace geo {
       nearest_to_what = wireReadoutGeom->NearestChannel(vect::toPoint(posWorld), PlaneID{0, 0, 0});
     }
     catch (InvalidWireError const& e) {
-      mf::LogWarning("GeoTestCaughtException")
+      LAR_LOG_WARNING
         << e << "\nReturned wire would be: " << e.badWire() << ", suggested: " << e.suggestedWire();
       hasThrown = true;
     }
     catch (cet::exception& e) {
-      mf::LogWarning("GeoTestCaughtException") << e;
+      LAR_LOG_WARNING << e;
       hasThrown = true;
     }
     if (!hasThrown) {
       if (fDisableValidWireIDcheck) {
         // ok, then why do we disable it?  an implementation might prefer to cap the wire
         // number and go on instead of throwing.
-        MF_LOG_WARNING("GeoTestWireCoordinate")
+        LAR_LOG_WARNING
           << "GeometryCore::NearestChannel() did not raise an exception"
              " on out-of-world position ("
           << posWorld[0] << "; " << posWorld[1] << "; " << posWorld[2] << "), and returned "
@@ -2028,7 +2027,7 @@ namespace geo {
     unsigned int nErrors = 0;
     for (auto const& TPC : geom->Iterate<TPCGeo>()) {
 
-      MF_LOG_DEBUG("GeometryTest") << "Wire intersection test on " << TPC.ID();
+      LAR_LOG_DEBUG << "Wire intersection test on " << TPC.ID();
 
       // sanity: wires on different cryostats
       if (TPC.ID().Cryostat < geom->Ncryostats() - 1) {
@@ -2047,10 +2046,10 @@ namespace geo {
         }
         if (otherPlane) {
           WireID const w2{otherPlane->ID(), 1};
-          MF_LOG_TRACE("GeometryTest") << "Off cryostat test (" << w1 << "): chosen wire " << w2;
+          LAR_LOG_TRACE << "Off cryostat test (" << w1 << "): chosen wire " << w2;
           Point_t xingPoint;
           if (wireReadoutGeom->WireIDsIntersect(w1, w2, xingPoint)) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "WireIDsIntersect() on " << w1 << " and " << w2 << " returned " << xingPoint
               << " cm, while should have reported no intersection at all";
             ++nErrors;
@@ -2060,13 +2059,13 @@ namespace geo {
             wire1.IntersectionWith(wireReadoutGeom->Wire(w2));
           }
           catch (...) {
-            MF_LOG_ERROR("GeometryTest") << "WiresIntersect() on " << w1 << " and " << w2
+            LAR_LOG_ERROR << "WiresIntersect() on " << w1 << " and " << w2
                                          << " threw an exception, which should not have";
             ++nErrors;
           }
         }
         else {
-          MF_LOG_WARNING("GeometryTest")
+          LAR_LOG_WARNING
             << "No wire plane found in " << otherCryo.ID() << " with wires not aligned with "
             << w1.asPlaneID() << ", " << wireDir << "; off-cryostat sanity check skipped.";
         }
@@ -2091,10 +2090,10 @@ namespace geo {
         }
         if (otherPlane) {
           WireID const w2{otherPlane->ID(), 1};
-          MF_LOG_TRACE("GeometryTest") << "Off TPC test (" << w1 << "): chosen wire " << w2;
+          LAR_LOG_TRACE << "Off TPC test (" << w1 << "): chosen wire " << w2;
           Point_t xingPoint;
           if (wireReadoutGeom->WireIDsIntersect(w1, w2, xingPoint)) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "WireIDsIntersect() on " << w1 << " and " << w2 << " returned " << xingPoint
               << ", while should have reported no intersection at all";
             ++nErrors;
@@ -2104,13 +2103,13 @@ namespace geo {
             wire1.IntersectionWith(wireReadoutGeom->Wire(w2));
           }
           catch (...) {
-            MF_LOG_ERROR("GeometryTest") << "WiresIntersect() on " << w1 << " and " << w2
+            LAR_LOG_ERROR << "WiresIntersect() on " << w1 << " and " << w2
                                          << " threw an exception, which should not have";
             ++nErrors;
           }
         }
         else {
-          MF_LOG_WARNING("GeometryTest")
+          LAR_LOG_WARNING
             << "No wire plane found in any TPC of " << cryo.ID() << " with wires not aligned with "
             << refPlaneID << ", " << wireDir << "; off-TPC sanity check skipped.";
         }
@@ -2121,7 +2120,7 @@ namespace geo {
         WireID const w1{plane.ID(), 0}, w2{plane.ID(), 1};
         Point_t xingPoint;
         if (wireReadoutGeom->WireIDsIntersect(w1, w2, xingPoint)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "WireIDsIntersect() on " << w1 << " and " << w2 << " returned " << xingPoint
             << ", while should have reported no intersection at all";
           ++nErrors;
@@ -2174,7 +2173,7 @@ namespace geo {
       WireIDs.emplace_back(plane.ID(), (unsigned int)std::round(WireDistance));
       WireDistances[iPlane] = (WireDistance - std::round(WireDistance)) * WirePitch[iPlane];
 
-      MF_LOG_DEBUG("GeometryTest")
+      LAR_LOG_DEBUG
         << "Nearest wire to " << point << " on plane " << std::string(plane.ID())
         << " (pitch: " << WirePitch[iPlane] << ", coord.dir.=" << WireCoordDirs[iPlane] << ") is "
         << WireIDs[iPlane] << " (position: " << WireDistance << ")";
@@ -2197,7 +2196,7 @@ namespace geo {
 
         Point_t xingPoint;
         if (!wireReadoutGeom->WireIDsIntersect(w1, w2, xingPoint)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "Wires " << w1 << " and " << w2 << " should intersect around " << point << " of TPC "
             << TPC.ID() << ", but they seem not to intersect at all!";
           ++nErrors;
@@ -2210,7 +2209,7 @@ namespace geo {
 
           auto widIntersect = wireReadoutGeom->WireIDsIntersect(w1, w2);
           if (!widIntersect) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "Legacy check: wires " << w1 << " and " << w2 << " should intersect around "
               << point << " of TPC " << TPC.ID() << ", but they seem not to intersect at all!";
             ++nErrors;
@@ -2218,7 +2217,7 @@ namespace geo {
 
           if (coordIs.nonEqual(widIntersect->y, xingPoint.Y()) ||
               coordIs.nonEqual(widIntersect->z, xingPoint.Z())) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "Legacy check: wires " << w1 << " and " << w2 << " should intersect around "
               << point << " of TPC " << TPC.ID() << ", but legacy code says (?, " << widIntersect->y
               << ", " << widIntersect->z << ")!";
@@ -2229,14 +2228,14 @@ namespace geo {
 
         Point_t xingPointInv;
         if (!wireReadoutGeom->WireIDsIntersect(w2, w1, xingPointInv)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "Wires " << w2 << " and " << w1 << " (reversed test) should intersect around "
             << point << " of TPC " << TPC.ID() << ", but they seem not to intersect at all!";
           ++nErrors;
           continue;
         }
         if (vectorIs.nonEqual(xingPointInv, xingPoint2)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "WireIDsIntersect() gives different intersections for " << w1 << " and " << w2
             << ": " << xingPoint2 << " (direct+shift) and " << xingPointInv << " (reversed)";
           ++nErrors;
@@ -2256,7 +2255,7 @@ namespace geo {
                     (1 - cet::square(cosAlpha)));
         // the actual distance we have found:
         double const d = plane1.Projection(xingPoint - point).R();
-        MF_LOG_DEBUG("GeometryTest")
+        LAR_LOG_DEBUG
           << " - wires " << w1 << " and " << w2 << " intersect at " << xingPoint << ", " << d
           << " cm far from starting point (expected: " << expected_d << ")";
 
@@ -2265,7 +2264,7 @@ namespace geo {
         lar::util::RealComparisons<double> wireCoordIs(
           std::max(WirePitch[iPlane1], WirePitch[iPlane2]) * 1e-3); // cm
         if (wireCoordIs.nonEqual(d, expected_d)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "wires " << w1 << " and " << w2 << " intersect at " << xingPoint << ", " << d
             << " cm far from starting point: too far from the expected " << expected_d << " cm!";
           ++nErrors;
@@ -2278,7 +2277,7 @@ namespace geo {
         // validated one from geom->WireIDsIntersect()
         objXingPoint = WiresIntersection(w1obj, w2obj);
         if (vectorIs.nonEqual(objXingPoint, xingPoint)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "geo::WiresIntersection() gives wrong intersection for " << w1 << " and " << w2
             << ": " << objXingPoint << " vs. " << xingPoint << " (expected)";
           ++nErrors;
@@ -2289,7 +2288,7 @@ namespace geo {
         // validated one from geom->WireIDsIntersect()
         objXingPoint = w1obj.IntersectionWith(w2obj);
         if (vectorIs.nonEqual(objXingPoint, xingPoint)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "geo::WireGeo[" << w1 << "]::IntersectionWith() gives wrong intersection with " << w2
             << ": " << objXingPoint << " vs. " << xingPoint << " (expected)";
           ++nErrors;
@@ -2298,7 +2297,7 @@ namespace geo {
 
         objXingPoint = w2obj.IntersectionWith(w1obj);
         if (vectorIs.nonEqual(objXingPoint, xingPointInv)) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "geo::WireGeo[" << w2 << "]::IntersectionWith() gives wrong intersection with " << w1
             << ": " << objXingPoint << " vs. " << xingPoint << " (expected)";
           ++nErrors;
@@ -2331,7 +2330,7 @@ namespace geo {
       TPCID const& tpcid = TPC.ID();
 
       unsigned const int nPlanes = wireReadoutGeom->Nplanes(tpcid);
-      MF_LOG_DEBUG("GeometryTest") << tpcid << " (" << nPlanes << " planes)";
+      LAR_LOG_DEBUG << tpcid << " (" << nPlanes << " planes)";
 
       for (PlaneID::PlaneID_t iPlane1 = 0; iPlane1 < nPlanes; ++iPlane1) {
         PlaneID pid1(tpcid, iPlane1);
@@ -2352,12 +2351,12 @@ namespace geo {
             bError = hasCategory(e, "GeometryCore");
           } // try...catch
 
-          MF_LOG_TRACE("GeometryTest") << "  [" << pid1 << "], [" << pid2 << "] => "
+          LAR_LOG_TRACE << "  [" << pid1 << "], [" << pid2 << "] => "
                                        << (bError ? "error" : std::string(third_plane));
           if (bError) continue; // we got what we wanted
 
           if (!bError && !isValidInput) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "ThirdPlane() on " << pid1 << " and " << pid2 << " returned " << third_plane
               << ", while should have thrown an exception";
             ++nErrors;
@@ -2365,30 +2364,30 @@ namespace geo {
           } // if no error
 
           if (third_plane != tpcid) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "ThirdPlane() on " << pid1 << " and " << pid2 << " returned " << third_plane
               << ", on a different TPC!!!";
             ++nErrors;
           }
           else if (!third_plane.isValid) {
-            MF_LOG_ERROR("GeometryTest") << "ThirdPlane() on " << pid1 << " and " << pid2
+            LAR_LOG_ERROR << "ThirdPlane() on " << pid1 << " and " << pid2
                                          << " returned an invalid " << third_plane;
             ++nErrors;
           }
           else if (third_plane.Plane >= nPlanes) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "ThirdPlane() on " << pid1 << " and " << pid2 << " returned " << third_plane
               << " with plane out of range";
             ++nErrors;
           }
           else if (third_plane == pid1) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "ThirdPlane() on " << pid1 << " and " << pid2 << " returned " << third_plane
               << ", same as the first input";
             ++nErrors;
           }
           else if (third_plane == pid2) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "ThirdPlane() on " << pid1 << " and " << pid2 << " returned " << third_plane
               << ", same as the second input";
             ++nErrors;
@@ -2431,13 +2430,13 @@ namespace geo {
       double const driftVelocity = 0.1 * to_int(TPC.DriftSign());
 
       unsigned const int NPlanes = wireReadoutGeom->Nplanes(tpcid);
-      MF_LOG_DEBUG("GeometryTest") << tpcid << " (" << NPlanes << " planes)";
+      LAR_LOG_DEBUG << tpcid << " (" << NPlanes << " planes)";
 
       // sanity: planes on different cryostats
       if (tpcid.Cryostat < geom->Ncryostats() - 1) {
         PlaneID p1{tpcid, 0}, p2{tpcid.Cryostat + 1, tpcid.TPC, 1};
         bool bError = false;
-        double slope;
+        double slope=0.0;
         try {
           slope = wireReadoutGeom->ThirdPlane_dTdW(p1, +1.0, p2, -1.0);
         }
@@ -2447,7 +2446,7 @@ namespace geo {
           bError = hasCategory(e, "GeometryCore");
         } // try...catch
         if (!bError) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "ThirdPlane_dTdW() on " << p1 << " and " << p2 << " returned " << slope
             << ", while should have thrown an exception";
           ++nErrors;
@@ -2458,7 +2457,7 @@ namespace geo {
       if (tpcid.TPC < geom->NTPC(tpcid.asCryostatID()) - 1) {
         PlaneID p1{tpcid, 0}, p2{tpcid.Cryostat, tpcid.TPC + 1, 1};
         bool bError = false;
-        double slope;
+        double slope=0.0;
         try {
           slope = wireReadoutGeom->ThirdPlane_dTdW(p1, +1.0, p2, -1.0);
         }
@@ -2468,7 +2467,7 @@ namespace geo {
           bError = hasCategory(e, "GeometryCore");
         } // try...catch
         if (!bError) {
-          MF_LOG_ERROR("GeometryTest")
+          LAR_LOG_ERROR
             << "ThirdPlane_dTdW() on " << p1 << " and " << p2 << " returned " << slope
             << ", while should have thrown an exception";
           ++nErrors;
@@ -2502,8 +2501,8 @@ namespace geo {
         // default; for the test, it does not matter
         std::vector<std::pair<PlaneID, double>> dTdWs = ExpectedPlane_dTdW(A, B, driftVelocity);
 
-        if (mf::isDebugEnabled()) {
-          mf::LogTrace log("GeometryTest");
+        if (lar::log::debugEnabled()) {
+          auto log = LAR_LOG_TRACE;
           log << "Expected dT/dW for a segment with " << radius << " cm long projection at "
               << angle << " rad, and dT " << dT << " cm:";
           for (auto const& dTdW_info : dTdWs)
@@ -2611,26 +2610,26 @@ namespace geo {
             if (bValidInput) throw;
             bError = hasCategory(e, "GeometryCore");
             if (!bError) throw;
-            MF_LOG_TRACE("GeometryTest")
+            LAR_LOG_TRACE
               << input1.first << " slope:" << input1.second << "  " << input2.first
               << " slope:" << input2.second << "  => exception";
             continue;
           }
 
           if (!bValidInput && !bError) {
-            MF_LOG_ERROR("GeometryTest")
+            LAR_LOG_ERROR
               << "GeometryCore::ThirdPlane_dTdW() on " << input1.first << " and " << input2.first
               << " should have thrown an exception, it returned " << output_slope << " instead";
             ++nErrors;
             continue;
           } // if faulty input and no error
 
-          MF_LOG_TRACE("GeometryTest")
+          LAR_LOG_TRACE
             << input1.first << " slope:" << input1.second << "  " << input2.first
             << " slope:" << input2.second << "  => " << output.first << " slope:" << output_slope;
           if (((output.second == 0.) && (output_slope > 1e-3)) ||
               std::abs(output_slope / output.second - 1.) > 1e-3) {
-            MF_LOG_ERROR("testThirdPlane_dTdW_at")
+            LAR_LOG_ERROR
               << "GeometryCore::ThirdPlane_dTdW(): " << input1.first << " slope:" << input1.second
               << "  " << input2.first << " slope:" << input2.second << "  => " << output.first
               << " slope:" << output_slope << "  (expected: " << output.second << ")";
@@ -2657,17 +2656,17 @@ namespace geo {
       // the test instead
       if (geom->DetectorName() == "bo") { fExpectedWirePitches = {0.46977, 0.46977, 0.46977}; }
       if (!fExpectedWirePitches.empty()) {
-        mf::LogInfo("WirePitch")
+        LAR_LOG_INFO
           << "Using legacy wire pitch parameters hard-coded for the detector '"
           << geom->DetectorName() << "'";
       }
     }
     if (fExpectedWirePitches.empty()) {
-      mf::LogWarning("WirePitch")
+      LAR_LOG_WARNING
         << "no expected wire pitch; I'll just check that they are all the same";
     }
     else {
-      mf::LogInfo log("WirePitch");
+      auto log = LAR_LOG_INFO;
       log << "Expected wire pitch per plane, in centimetres:";
       for (double pitch : fExpectedWirePitches)
         log << " " << pitch;
@@ -2691,7 +2690,7 @@ namespace geo {
       if (fExpectedWirePitches.empty()) {
         WireGeo const& wire1 = plane.Wire(1); // pWire now points to wire0
         expectedPitch = WireGeo::WirePitch(*pWire, wire1);
-        MF_LOG_DEBUG("WirePitch") << "Wire pitch on " << planeid << ": " << expectedPitch << " cm";
+        LAR_LOG_DEBUG << "Wire pitch on " << planeid << ": " << expectedPitch << " cm";
       }
       else if (planeid.Plane < fExpectedWirePitches.size())
         expectedPitch = fExpectedWirePitches[planeid.Plane];
@@ -2705,7 +2704,7 @@ namespace geo {
 
         double const thisPitch = std::abs(pWire->DistanceFrom(*pPrevWire));
         if (std::abs(thisPitch - expectedPitch) > 1e-5) {
-          mf::LogProblem("WirePitch")
+          LAR_LOG_ERROR
             << "ERROR: on plane " << planeid << " pitch between wires W:" << (w - 1)
             << " and W:" << w << " is " << thisPitch << " cm, not " << expectedPitch
             << " as expected!";
@@ -2786,7 +2785,7 @@ namespace geo {
 
               double const interWireFromProj = plane.InterWireProjectedDistance(testProj);
               if (cmp.nonEqual(interWireFromProj, expected)) {
-                mf::LogProblem("")
+                LAR_LOG_ERROR
                   << "ERROR: on plane " << plane.ID()
                   << " distance between wires on projected direction " << testProj << " is "
                   << interWireFromProj << " cm (expected: " << expected << ")";
@@ -2806,7 +2805,7 @@ namespace geo {
 
                 double const interWire = plane.InterWireProjectedDistance(testDir);
                 if (cmp.nonEqual(interWire, expected)) {
-                  mf::LogProblem("")
+                  LAR_LOG_ERROR
                     << "ERROR: on plane " << plane.ID()
                     << " projected distance between wires on direction " << testDir
                     << " (from projection " << testProj << " and offset " << driftOffset << ") is "
@@ -2820,7 +2819,7 @@ namespace geo {
 
                 double const interWire3D = plane.InterWireDistance(testDir);
                 if (cmp.nonEqual(interWire3D, expected3D)) {
-                  mf::LogProblem("")
+                  LAR_LOG_ERROR
                     << "ERROR: on plane " << plane.ID() << " distance between wires on direction "
                     << testDir << " (from projection " << testProj << " and offset " << driftOffset
                     << ") is " << interWire3D << " cm (expected: " << expected3D << ")";
@@ -2853,17 +2852,17 @@ namespace geo {
       // configuration of the test instead
       if (geom->DetectorName() == "bo") { fExpectedPlanePitches = {0.65}; }
       if (!fExpectedPlanePitches.empty()) {
-        mf::LogInfo("PlanePitch")
+        LAR_LOG_INFO
           << "Using legacy plane pitch parameters hard-coded for the detector '"
           << geom->DetectorName() << "'";
       }
     }
     if (fExpectedPlanePitches.empty()) {
-      mf::LogWarning("PlanePitch") << "no expected plane pitch;"
+      LAR_LOG_WARNING << "no expected plane pitch;"
                                       " I'll just check that they are all the same";
     }
     else {
-      mf::LogInfo log("PlanePitch");
+      auto log = LAR_LOG_INFO;
       log << "Expected plane pitch per plane pair, in centimetres:";
       for (double pitch : fExpectedPlanePitches)
         log << " " << pitch;
@@ -2880,7 +2879,7 @@ namespace geo {
       double expectedPitch = 0.;
       if (fExpectedPlanePitches.empty()) {
         expectedPitch = wireReadoutGeom->PlanePitch(tpcid);
-        MF_LOG_DEBUG("PlanePitch") << "Plane pitch between the first two planes of " << tpcid
+        LAR_LOG_DEBUG << "Plane pitch between the first two planes of " << tpcid
                                    << ": " << expectedPitch << " cm";
       }
 
@@ -2901,7 +2900,7 @@ namespace geo {
 
         double const thisPitch = std::abs(wireReadoutGeom->PlanePitch(tpcid, p - 1, p));
         if (std::abs(thisPitch - expectedPitch) > 1e-5) {
-          mf::LogProblem("PlanePitch")
+          LAR_LOG_ERROR
             << "ERROR: pitch of planes P:" << (p - 1) << " and P: " << p << " in " << tpcid
             << " is " << thisPitch << " cm, not " << expectedPitch << " as expected!";
           ++nPitchErrors;
@@ -2930,9 +2929,9 @@ namespace geo {
     auto const xyz_orig = wireReadoutGeom->Plane(planeid).Wire(0).toWorldCoords(xyzWire);
     auto const dxyz_orig = wireReadoutGeom->Plane(planeid).Wire(0).toWorldCoords(dxyzWire);
 
-    mf::LogVerbatim("GeometryTest")
+    LAR_LOG_INFO
       << "\n\t" << xyz_orig.X() << "\t" << xyz_orig.Y() << "\t" << xyz_orig.Z();
-    mf::LogVerbatim("GeometryTest")
+    LAR_LOG_INFO
       << "\t" << dxyz_orig.X() << "\t" << dxyz_orig.Y() << "\t" << dxyz_orig.Z();
 
     double xyz[3];
@@ -2943,7 +2942,7 @@ namespace geo {
     for (int i = 0; i < 10; ++i) {
       const double* pos = gGeoManager->GetCurrentPoint();
       const double* dir = gGeoManager->GetCurrentDirection();
-      mf::LogVerbatim("GeometryTest")
+      LAR_LOG_INFO
         << "\tnode = " << gGeoManager->GetCurrentNode()->GetName() << "\n\t\tpos="
         << "\t" << pos[0] << "\t" << pos[1] << "\t" << pos[2] << "\n\t\tdir="
         << "\t" << dir[0] << "\t" << dir[1] << "\t" << dir[2]
@@ -2958,7 +2957,7 @@ namespace geo {
     xyz[1] = -7.23775;
     xyz[2] = 856.757;
     gGeoManager->InitTrack(xyz, dxyz);
-    mf::LogVerbatim("GeometryTest")
+    LAR_LOG_INFO
       << "\tnode = " << gGeoManager->GetCurrentNode()->GetName()
       << "\n\tmat = " << gGeoManager->GetCurrentNode()->GetVolume()->GetMaterial()->GetName();
 
@@ -3010,14 +3009,14 @@ namespace geo {
       foundDet = auxDetGeom->FindAuxDetAtPosition(pos);
     }
     catch (cet::exception const& e) {
-      mf::LogProblem("GeometryTestAlg")
+        LAR_LOG_ERROR
         << "Caught an exception while looking for aux det around " << lar::dump::array<3U>(pos)
         << " (within aux det #" << expected << "); message:\n"
         << e.what();
       return false;
     }
     if (foundDet != expected) {
-      mf::LogProblem("GeometryTestAlg")
+        LAR_LOG_ERROR
         << "Auxiliary detector at position " << lar::dump::array<3U>(pos)
         << ", expected within aux det #" << expected << ", was returned to be " << foundDet
         << " instead";
@@ -3037,7 +3036,7 @@ namespace geo {
       auxDetGeom->FindAuxDetSensitiveAtPosition(pos, foundDet, foundSensDet);
     }
     catch (cet::exception const& e) {
-      mf::LogProblem("GeometryTestAlg")
+        LAR_LOG_ERROR
         << "Caught an exception while looking for aux det sensitive around "
         << lar::dump::array<3U>(pos) << " (within aux det #" << expectedDet << " sensitive volume #"
         << expectedSens << "); message:\n"
@@ -3045,7 +3044,7 @@ namespace geo {
       return false;
     }
     if ((foundDet != expectedDet) || (foundSensDet != expectedSens)) {
-      mf::LogProblem("GeometryTestAlg")
+      LAR_LOG_ERROR
         << "Auxiliary detector at position " << lar::dump::array<3U>(pos)
         << ", expected within aux det #" << expectedDet << ", sensitive volume #" << expectedSens
         << ", was returned to be in aux det #" << foundDet << " sensitive volume #" << foundSensDet

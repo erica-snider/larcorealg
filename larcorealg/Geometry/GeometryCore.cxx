@@ -23,7 +23,7 @@
 // Framework includes
 #include "cetlib_except/exception.h"
 #include "fhiclcpp/types/Table.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // ROOT includes
 #include "TGeoBBox.h"
@@ -101,13 +101,13 @@ namespace geo {
 
     SortGeometry();
 
-    mf::LogInfo("GeometryCore") << "New detector geometry loaded from\n\t" << fGDMLfile;
+    LAR_LOG_INFO << "New detector geometry loaded from\n\t" << fGDMLfile;
   }
 
   //......................................................................
   void GeometryCore::SortGeometry()
   {
-    mf::LogInfo("GeometryCore") << "Sorting volumes...";
+    LAR_LOG_INFO << "Sorting volumes...";
 
     if (not fSorter) { return; }
 
@@ -452,7 +452,7 @@ namespace geo {
     double halfwidth = ((TGeoBBox*)volWorld->GetShape())->GetDX();
     if (std::abs(point.x()) > halfwidth || std::abs(point.y()) > halfheight ||
         std::abs(point.z()) > halflength) {
-      mf::LogWarning("GeometryCoreBadInputPoint")
+      LAR_LOG_WARNING
         << "point (" << point.x() << "," << point.y() << "," << point.z() << ") "
         << "is not inside the world volume "
         << " half width = " << halfwidth << " half height = " << halfheight
@@ -478,14 +478,14 @@ namespace geo {
     // check that the given point is in the World volume at least
     BoxBoundedGeo worldBox = WorldBox();
     if (!worldBox.ContainsPosition(point)) {
-      mf::LogWarning("GeometryCoreBadInputPoint")
+      LAR_LOG_WARNING
         << "point " << point << " is not inside the world volume " << worldBox.Min() << " -- "
         << worldBox.Max() << "; returning unknown material name";
       return {"unknownMaterial"};
     }
     auto const pMaterial = Material(point);
     if (!pMaterial) {
-      mf::LogWarning("GeometryCoreBadInputPoint")
+      LAR_LOG_WARNING
         << "material for point " << point << " not found! returning unknown material name";
       return {"unknownMaterial"};
     }

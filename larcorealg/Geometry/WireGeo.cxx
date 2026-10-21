@@ -10,9 +10,6 @@
 #include "larcorealg/Geometry/geo_vectors_utils.h"                // geo::vect
 #include "larcoreobj/SimpleTypesAndConstants/PhysicalConstants.h" // util ns
 
-// framework
-#include "messagefacility/MessageLogger/MessageLogger.h"
-
 // ROOT
 #include "TGeoNode.h"
 #include "TGeoTube.h"

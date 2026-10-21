@@ -73,7 +73,7 @@ cet_make_library(LIBRARY_NAME ReadoutDataContainers INTERFACE
 cet_make_library(LIBRARY_NAME StandaloneBasicSetup INTERFACE
   SOURCE StandaloneBasicSetup.h
   LIBRARIES INTERFACE
-  messagefacility::MF_MessageLogger
+  larcoreobj::LoggingUtil
   fhiclcpp::fhiclcpp
   cetlib::cetlib
 )
@@ -154,6 +154,7 @@ cet_make_library(SOURCE
   larcoreobj::geo_vectors
   fhiclcpp::types
   fhiclcpp::fhiclcpp
+  fmt::fmt
   cetlib::cetlib
   cetlib_except::cetlib_except
   CLHEP::Geometry
@@ -167,7 +168,6 @@ cet_make_library(SOURCE
   Boost::filesystem
   larcorealg::Exceptions
   larcorealg::geo_vectors_utils_TVector
-  messagefacility::MF_MessageLogger
   cetlib::container_algorithms
   ROOT::MathCore
 )

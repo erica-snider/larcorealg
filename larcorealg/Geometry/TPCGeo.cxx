@@ -12,7 +12,7 @@
 // Framework includes
 #include "cetlib/container_algorithms.h"
 #include "cetlib_except/exception.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // ROOT includes
 #include "TGeoBBox.h"
@@ -73,8 +73,8 @@ namespace geo {
     fActiveCenter = vect::toPoint(ActiveHMatrix(ROOT::Math::Transform3D::Point{}));
     fActiveVolume = active_node->GetVolume();
 
-    MF_LOG_DEBUG("Geometry") << "detector total  volume is " << fTotalVolume->GetName()
-                             << "\ndetector active volume is " << fActiveVolume->GetName();
+    LAR_LOG_DEBUG << "detector total  volume is " << fTotalVolume->GetName()
+                  << "\ndetector active volume is " << fActiveVolume->GetName();
 
     // set the width, height, and lengths
     auto const* active_volume_box = static_cast<TGeoBBox const*>(fActiveVolume->GetShape());

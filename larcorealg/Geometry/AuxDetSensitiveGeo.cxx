@@ -16,7 +16,7 @@
 #include "TGeoVolume.h"
 
 // Framework includes
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // C++ standard libraries
 #include <sstream> // std::ostringstream
@@ -28,7 +28,7 @@ namespace geo {
     : fTrans(std::move(trans)), fTotalVolume(node->GetVolume())
   {
 
-    MF_LOG_DEBUG("Geometry") << "detector sensitive total  volume is " << fTotalVolume->GetName();
+    LAR_LOG_DEBUG << "detector sensitive total  volume is " << fTotalVolume->GetName();
 
     InitShapeSize();
   }

@@ -15,7 +15,7 @@
 // Framework includes
 #include "cetlib/pow.h"
 #include "cetlib_except/exception.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // ROOT includes
 #include "TClass.h"
@@ -622,8 +622,8 @@ namespace geo {
     // how do they look like in the world?
     TGeoBBox const* pShape = dynamic_cast<TGeoBBox const*>(Volume().GetShape());
     if (!pShape) {
-      mf::LogError("BoxInfo") << "Volume " << Volume().IsA()->GetName()
-                              << " is not a TGeoBBox! Dimensions won't be available.";
+      LAR_LOG_ERROR << "Volume " << Volume().IsA()->GetName()
+                    << " is not a TGeoBBox! Dimensions won't be available.";
       // set it invalid
       fDecompFrame.SetOrigin(origin());
       fDecompFrame.SetMainDir({0., 0., 0.});

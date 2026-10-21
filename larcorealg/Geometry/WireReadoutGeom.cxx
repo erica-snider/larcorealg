@@ -11,7 +11,7 @@
 #include "larcorealg/Geometry/Intersections.h"
 #include "larcorealg/Geometry/WireReadoutGeomBuilderStandard.h"
 
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 #include "TGeoManager.h"
 
@@ -548,24 +548,24 @@ namespace geo {
     // violates interoperability
     std::vector<WireID> chan1wires = ChannelToWire(c1);
     if (chan1wires.empty()) {
-      mf::LogError("ChannelsIntersect")
+      LAR_LOG_ERROR
         << "1st channel " << c1 << " maps to no wire (is it a real one?)";
       return std::nullopt;
     }
     std::vector<WireID> chan2wires = ChannelToWire(c2);
     if (chan2wires.empty()) {
-      mf::LogError("ChannelsIntersect")
+      LAR_LOG_ERROR
         << "2nd channel " << c2 << " maps to no wire (is it a real one?)";
       return std::nullopt;
     }
 
     if (chan1wires.size() > 1) {
-      mf::LogWarning("ChannelsIntersect")
+      LAR_LOG_WARNING
         << "1st channel " << c1 << " maps to " << chan2wires.size() << " wires; using the first!";
       return std::nullopt;
     }
     if (chan2wires.size() > 1) {
-      mf::LogError("ChannelsIntersect")
+      LAR_LOG_ERROR
         << "2nd channel " << c2 << " maps to " << chan2wires.size() << " wires; using the first!";
       return std::nullopt;
     }
@@ -582,23 +582,23 @@ namespace geo {
   bool WireReadoutGeom::WireIDIntersectionCheck(WireID const& wid1, WireID const& wid2) const
   {
     if (wid1.asTPCID() != wid2) {
-      mf::LogError("WireIDIntersectionCheck")
+      LAR_LOG_ERROR
         << "Comparing two wires on different TPCs: return failure.";
       return false;
     }
     if (wid1.Plane == wid2.Plane) {
-      mf::LogError("WireIDIntersectionCheck")
+      LAR_LOG_ERROR
         << "Comparing two wires in the same plane: return failure";
       return false;
     }
     if (!HasWire(wid1)) {
-      mf::LogError("WireIDIntersectionCheck")
+      LAR_LOG_ERROR
         << "1st wire " << wid1 << " does not exist (max wire number: " << Nwires(wid1.planeID())
         << ")";
       return false;
     }
     if (!HasWire(wid2)) {
-      mf::LogError("WireIDIntersectionCheck")
+      LAR_LOG_ERROR
         << "2nd wire " << wid2 << " does not exist (max wire number: " << Nwires(wid2.planeID())
         << ")";
       return false;

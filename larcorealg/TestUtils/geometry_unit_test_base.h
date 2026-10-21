@@ -32,11 +32,11 @@
 #include "larcorealg/Geometry/GeometryBuilderStandard.h"
 #include "larcorealg/Geometry/GeometryCore.h"
 #include "larcorealg/TestUtils/unit_test_base.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // Framework libraries
 #include "cetlib/search_path.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
 #include <iostream> // for output before message facility is set up
@@ -250,7 +250,7 @@ namespace testing {
   template <typename ConfigurationClass, typename ObjectSorter>
   GeometryTesterEnvironment<ConfigurationClass, ObjectSorter>::~GeometryTesterEnvironment()
   {
-    mf::LogInfo("Test") << config.ApplicationName() << " completed.";
+    LAR_LOG_INFO << config.ApplicationName() << " completed.";
   }
 
   /** **************************************************************************
@@ -284,7 +284,7 @@ namespace testing {
   {
     TesterEnvironment_t::Setup();
     this->AcquireProvider(CreateNewGeometry());
-    mf::LogInfo("Test") << config.ApplicationName() << " Geometry setup complete.";
+    LAR_LOG_INFO << config.ApplicationName() << " Geometry setup complete.";
   }
 
 } // namespace testing

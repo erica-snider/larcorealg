@@ -10,7 +10,7 @@
 
 // Framework includes
 #include "cetlib_except/exception.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // ROOT includes
 #include "TClass.h"
@@ -40,7 +40,7 @@ namespace geo {
     // all planes are going to be contained in the volume named volCryostat
     if (!fVolume) throw cet::exception("CryostatGeo") << "cannot find cryostat outline volume\n";
 
-    MF_LOG_DEBUG("Geometry") << "cryostat  volume is " << fVolume->GetName();
+    LAR_LOG_DEBUG << "cryostat  volume is " << fVolume->GetName();
 
     // set the bounding box
     InitCryoBoundaries();

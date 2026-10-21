@@ -48,10 +48,10 @@ namespace geo {
  * However, for streams which support inserter operators to `std::ostream`,
  * the following is also possible:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.cpp}
- * mf::LogInfo{ "DumpGeometry" } << dumper.toStream();
+ * std::cout << dumper.toStream();
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * The messagefacility library streams (like in this example) fall into this
- * category.
+ * Other stream-like logging sinks may also use this adapter when they support
+ * insertion into `std::ostream`.
  *
  * The output is documented in the `dump()` method.
  *

@@ -13,7 +13,7 @@
 #include "larcorealg/Geometry/WireReadoutGeomBuilderStandard.h"
 
 #include "cetlib_except/exception.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 namespace {
   //----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ namespace geo {
   {
     fNcryostat = geom->Ncryostats();
 
-    mf::LogInfo("WireReadoutStandardGeom") << "Initializing standard wire-readout geometry...";
+    LAR_LOG_INFO << "Initializing standard wire-readout geometry...";
 
     fNTPC.resize(fNcryostat);
     fWireCounts.resize(fNcryostat);
@@ -157,7 +157,7 @@ namespace geo {
     // calculate the total number of channels in the detector
     fNchannels = fTopChannel;
 
-    MF_LOG_DEBUG("ChannelMapStandard") << "# of channels is " << fNchannels;
+    LAR_LOG_DEBUG << "# of channels is " << fNchannels;
   }
 
   //----------------------------------------------------------------------------
@@ -286,9 +286,8 @@ namespace geo {
     }
 
     // made it here, that shouldn't happen, return raw::InvalidChannelID
-    mf::LogWarning("WireReadoutStandardGeom")
-      << "should not be at the point in the function, returning "
-      << "invalid channel";
+    LAR_LOG_WARNING << "should not be at the point in the function, returning "
+                    << "invalid channel";
     return raw::InvalidChannelID;
   }
 
@@ -313,8 +312,7 @@ namespace geo {
       sigt = kCollection;
     }
     else
-      mf::LogWarning("BadChannelSignalType")
-        << "Channel " << channel << " not given signal type." << std::endl;
+      LAR_LOG_WARNING << "Channel " << channel << " not given signal type." << std::endl;
 
     return sigt;
   }

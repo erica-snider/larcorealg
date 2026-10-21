@@ -24,7 +24,7 @@
 
 // utility libraries
 #include "fhiclcpp/ParameterSet.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // C/C++ standard libraries
 #include <stdexcept> // std::runtime_error
@@ -76,7 +76,6 @@ int main(int argc, char const** argv)
 
   // set up message facility
   SetupMessageFacility(pset, "geometry_loader_test");
-  mf::SetContextIteration("setup");
 
   // set up geometry
   auto geom = SetupGeometry(pset.get<fhicl::ParameterSet>("services.Geometry"));
@@ -86,7 +85,6 @@ int main(int argc, char const** argv)
     SetupAuxDetGeometry(pset.get<fhicl::ParameterSet>("services.AuxDetGeometry", {}));
 
   // update the context string for the messages
-  mf::SetContextIteration("run");
 
   // 2. prepare the test algorithm
   geo::GeometryTestAlg Tester(geom.get(),
@@ -98,8 +96,7 @@ int main(int argc, char const** argv)
   unsigned int nErrors = Tester.Run();
 
   // 4. And finally we cross fingers.
-  mf::SetContextIteration("end");
-  if (nErrors > 0) { mf::LogError("geometry_test") << nErrors << " errors detected!"; }
+  if (nErrors > 0) { LAR_LOG_ERROR << nErrors << " errors detected!"; }
 
   return nErrors;
 } // main()

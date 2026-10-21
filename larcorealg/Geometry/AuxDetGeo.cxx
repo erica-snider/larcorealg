@@ -18,7 +18,7 @@
 
 // Framework includes
 #include "cetlib_except/exception.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 // C/C++ libraries
 #include <algorithm>
@@ -36,7 +36,7 @@ namespace geo {
   {
     if (!fTotalVolume) throw cet::exception("AuxDetGeo") << "cannot find AuxDet volume\n";
 
-    MF_LOG_DEBUG("Geometry") << "detector total  volume is " << fTotalVolume->GetName();
+    LAR_LOG_DEBUG << "detector total  volume is " << fTotalVolume->GetName();
 
     // if there are no sensitive volumes then this aux det
     // could be from an older gdml file than the introduction of AuxDetSensitiveGeo

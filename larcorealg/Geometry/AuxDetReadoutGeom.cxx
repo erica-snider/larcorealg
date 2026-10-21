@@ -8,7 +8,7 @@
 #include "larcorealg/Geometry/AuxDetSensitiveGeo.h"
 
 #include "cetlib_except/exception.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 #include <limits>
 
@@ -63,7 +63,7 @@ namespace geo {
 
     if (throwIfAbsent) { throw cet::exception("AuxDetReadoutGeom") << msg.str(); }
 
-    mf::LogDebug("AuxDetReadoutGeom") << msg.str();
+    LAR_LOG_DEBUG << msg.str();
     return invalid_index;
   }
 
@@ -104,7 +104,7 @@ namespace geo {
 
     if (throwIfAbsent) { throw cet::exception("AuxDetReadoutGeom") << msg.str(); }
 
-    mf::LogDebug("AuxDetReadoutGeom") << msg.str();
+    LAR_LOG_DEBUG << msg.str();
     return invalid_index;
   }
 

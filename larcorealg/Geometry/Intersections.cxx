@@ -2,7 +2,7 @@
 #include "larcorealg/CoreUtils/NumericUtils.h"
 #include "larcorealg/CoreUtils/RealComparisons.h"
 
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "larcoreobj/LoggingUtil/Logging.h"
 
 namespace geo {
 
@@ -56,7 +56,7 @@ namespace geo {
       A_start_x, A_start_y, A_end_x, A_end_y, B_start_x, B_start_y, B_end_x, B_end_y, x, y);
 
     if (bCross) {
-      mf::LogWarning("IntersectSegments") << "The segments are parallel!";
+      LAR_LOG_WARNING << "The segments are parallel!";
       return false;
     }
 
